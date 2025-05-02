@@ -97,7 +97,6 @@ RESPONSE (ONLY the JSON array):`;
             config,
         });
 
-        console.log("Raw response from Gemini API:", response);
 
         // Get the response text
         const responseText = response.text;

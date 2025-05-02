@@ -57,6 +57,7 @@ const analyzeText = async (elementId, text, checks, tabId) => {
         const { apiKey } = await chrome.storage.local.get(["apiKey"]);
 
         if (!apiKey) {
+            console.warn("TextWarden: No API key found, skipping analysis");
             // No API key, send empty result
             sendAnalysisResult(tabId, elementId, text, []);
             return;
@@ -72,6 +73,7 @@ const analyzeText = async (elementId, text, checks, tabId) => {
             body: JSON.stringify({
                 text: text,
                 checks: checks,
+                apiKey: apiKey,
             }),
         });
 

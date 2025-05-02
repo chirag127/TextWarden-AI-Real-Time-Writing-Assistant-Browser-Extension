@@ -29,9 +29,11 @@ router.get("/health", (req, res) => {
  * Request header: X-User-API-Key: string
  */
 router.post("/ai/suggest", async (req, res) => {
-    const { text, checks } = req.body;
+    const { text, checks,apiKey } = req.body;
     // Retrieve key securely from header
     const userApiKey = req.headers["X-User-API-Key"];
+
+    console.log("Received request for text analysis:", { text, checks, apiKey: userApiKey });
 
     // Validate input
     if (!text) {
@@ -63,7 +65,7 @@ router.post("/ai/suggest", async (req, res) => {
 
     try {
         // Call Gemini API with user's key and specified checks
-        const result = await getGeminiSuggestion(text, userApiKey, validChecks);
+        const result = await getGeminiSuggestion(text, apiKey, validChecks);
 
         if (result.error) {
             // Determine appropriate status code based on error type
