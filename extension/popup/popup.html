@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TextWarden</title>
   <link rel="stylesheet" href="popup.css">
 </head>
-
 <body>
-  <div class="popup-container">
-    <header class="popup-header">
-      <div class="logo-container">
-        <img src="../icons/icon48.png" alt="TextWarden Logo" class="logo">
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="../icons/icon48.png" alt="TextWarden Logo">
         <h1>TextWarden</h1>
       </div>
       <div class="toggle-container">
@@ -20,21 +18,12 @@
           <input type="checkbox" id="enableToggle" checked>
           <span class="slider round"></span>
         </label>
+        <span id="statusText">Enabled</span>
       </div>
     </header>
 
-    <div class="popup-content">
-      <section class="settings-section">
-        <h2>Language</h2>
-        <div class="select-container">
-          <select id="languageSelect">
-            <option value="en-US">English (US)</option>
-            <option value="en-GB">English (UK)</option>
-          </select>
-        </div>
-      </section>
-
-      <section class="settings-section">
+    <div class="content">
+      <div class="section">
         <h2>Check Types</h2>
         <div class="check-options">
           <label class="check-option">
@@ -54,44 +43,40 @@
             <span>Clarity</span>
           </label>
         </div>
-      </section>
+      </div>
 
-      <section class="settings-section">
-        <h2>Custom Dictionary</h2>
-        <div class="dictionary-container">
-          <div class="dictionary-input-container">
-            <input type="text" id="customWordInput" placeholder="Add a word...">
-            <button id="addWordBtn" class="primary-button">Add</button>
-          </div>
-          <div class="dictionary-list" id="customDictionaryList">
-            <!-- Custom words will be added here dynamically -->
-            <div class="empty-dictionary-message">No custom words added yet.</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="stats-section">
+      <div class="section">
         <h2>Statistics</h2>
-        <div class="stats-container">
+        <div class="stats">
           <div class="stat-item">
-            <div class="stat-value" id="correctionsCount">0</div>
-            <div class="stat-label">Corrections</div>
+            <span class="stat-label">Corrections Applied:</span>
+            <span class="stat-value" id="correctionsCount">0</span>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="suggestionsCount">0</div>
-            <div class="stat-label">Suggestions</div>
+            <span class="stat-label">Suggestions Shown:</span>
+            <span class="stat-value" id="suggestionsCount">0</span>
           </div>
+          <button id="resetStats" class="btn-secondary">Reset Stats</button>
         </div>
-      </section>
+      </div>
+
+      <div class="section api-key-status">
+        <h2>API Key Status</h2>
+        <div id="apiKeyStatus" class="api-status not-set">
+          <span id="apiKeyStatusText">No API key set</span>
+          <button id="goToSettings" class="btn-primary">Add API Key</button>
+        </div>
+        <p class="api-key-note">
+          An API key is required for AI-powered features. Core grammar and spelling checks work without a key.
+        </p>
+      </div>
     </div>
 
-    <footer class="popup-footer">
-      <button id="resetStatsBtn" class="secondary-button">Reset Stats</button>
-      <button id="clearCacheBtn" class="secondary-button">Clear Cache</button>
+    <footer>
+      <button id="openSettings" class="btn-link">Settings</button>
+      <span class="version">v1.0.0</span>
     </footer>
   </div>
-
   <script src="popup.js"></script>
 </body>
-
 </html>

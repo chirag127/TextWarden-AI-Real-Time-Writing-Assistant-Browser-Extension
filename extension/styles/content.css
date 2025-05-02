@@ -1,0 +1,100 @@
+/**
+ * TextWarden Content Styles
+ * 
+ * These styles are injected into web pages for highlighting issues and displaying suggestions.
+ * 
+ * @author Chirag Singhal (chirag127)
+ */
+
+/* Highlight for text fields with issues */
+.textwarden-has-issues {
+  border-bottom: 2px dotted #ff006e !important;
+}
+
+/* Suggestion popup */
+.textwarden-suggestion-popup {
+  position: absolute;
+  z-index: 999999;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #212529;
+  color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  display: none;
+}
+
+/* Popup header */
+.textwarden-popup-header {
+  padding: 12px 16px;
+  background-color: #3a86ff;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Suggestions list */
+.textwarden-suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Suggestion item */
+.textwarden-suggestion-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #343a40;
+}
+
+.textwarden-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Issue text */
+.textwarden-issue-text {
+  color: #ff006e;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* Suggestion text */
+.textwarden-suggestion-text {
+  color: #38b000;
+  margin-bottom: 12px;
+}
+
+/* Apply button */
+.textwarden-apply-button {
+  background-color: #3a86ff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.textwarden-apply-button:hover {
+  background-color: #2a75e8;
+}
+
+/* Highlight types */
+.textwarden-grammar-issue {
+  border-bottom: 2px dotted #ff006e !important;
+}
+
+.textwarden-spelling-issue {
+  border-bottom: 2px dotted #ffbe0b !important;
+}
+
+.textwarden-style-issue {
+  border-bottom: 2px dotted #8338ec !important;
+}
+
+.textwarden-clarity-issue {
+  border-bottom: 2px dotted #3a86ff !important;
+}

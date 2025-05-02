@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TextWarden",
   "version": "1.0.0",
-  "description": "AI-powered writing assistant that provides real-time grammar, spelling, style, and clarity suggestions.",
+  "description": "AI-powered writing assistant that provides real-time grammar, spelling, style, and clarity suggestions",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -22,17 +22,24 @@
     "scripting"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "http://localhost:3000/*"
   ],
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "scripts/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["scripts/content.js"],
-      "css": ["scripts/content.css"],
-      "run_at": "document_end"
+      "css": ["styles/content.css"]
+    }
+  ],
+  "options_page": "settings/settings.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["styles/*", "icons/*"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

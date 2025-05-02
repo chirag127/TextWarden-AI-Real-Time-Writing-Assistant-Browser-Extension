@@ -1,59 +1,41 @@
 /**
  * TextWarden Backend Test
  * 
- * This script tests the text analysis functionality of the backend
+ * This file contains simple tests for the TextWarden backend server.
+ * 
+ * @author Chirag Singhal (chirag127)
  */
 
-const { analyzeText } = require('./utils/geminiClient');
+console.log('Starting TextWarden backend tests...');
 
-// Test text with various errors
-const testText = `
-This is a test of the TextWarden system. It contians some common spelling errors.
-Their are also some grammar mistakes in this sentance.
-I recieved your email and I will definately respond soon.
-This is a very good product that is really bad for the environment.
-In order to improve the quality, we need to make changes due to the fact that our customers are complaining.
-`;
-
-// Test preferences
-const testPreferences = {
-  language: 'en-US',
-  checkGrammar: true,
-  checkSpelling: true,
-  checkStyle: true,
-  checkClarity: true
-};
-
-// Run the test
-async function runTest() {
-  console.log('TextWarden Backend Test');
-  console.log('----------------------');
-  console.log('Test text:');
-  console.log(testText);
-  console.log('----------------------');
-  
-  try {
-    console.log('Analyzing text...');
-    const suggestions = await analyzeText(testText, testPreferences);
-    
-    console.log('Analysis complete!');
-    console.log('----------------------');
-    console.log(`Found ${suggestions.length} suggestions:`);
-    
-    suggestions.forEach((suggestion, index) => {
-      console.log(`\n[${index + 1}] ${suggestion.type.toUpperCase()} ISSUE:`);
-      console.log(`Text: "${suggestion.text}"`);
-      console.log(`Position: ${suggestion.position.start}-${suggestion.position.end}`);
-      console.log(`Suggestions: ${suggestion.suggestions.join(', ')}`);
-      console.log(`Explanation: ${suggestion.explanation}`);
-    });
-    
-    console.log('\n----------------------');
-    console.log('Test completed successfully!');
-  } catch (error) {
-    console.error('Test failed:', error);
-  }
+// Test the server startup
+try {
+  const app = require('./server');
+  console.log('✅ Server imported successfully');
+} catch (error) {
+  console.error('❌ Server import failed:', error.message);
+  process.exit(1);
 }
 
-// Run the test
-runTest();
+// Test the Gemini utility
+try {
+  const { getGeminiSuggestion } = require('./utils/gemini');
+  
+  // Test with missing API key
+  const missingKeyTest = async () => {
+    const result = await getGeminiSuggestion('Test text', null);
+    if (result.error && result.message.includes('API Key is missing')) {
+      console.log('✅ Gemini utility correctly handles missing API key');
+    } else {
+      console.error('❌ Gemini utility failed to handle missing API key correctly');
+    }
+  };
+  
+  missingKeyTest();
+  console.log('✅ Gemini utility imported successfully');
+} catch (error) {
+  console.error('❌ Gemini utility import failed:', error.message);
+}
+
+console.log('\nNote: To test with a real API key, you would need to provide your own Gemini API key.');
+console.log('Backend tests completed. For full API testing, start the server and use tools like Postman or curl.');
