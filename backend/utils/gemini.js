@@ -30,7 +30,7 @@ async function getGeminiSuggestion(userInputText, userApiKey) {
     try {
         // Initialize dynamically with the user's key for THIS request
         // Initialize Google GenAI with the provided API key
-        const ai = new GoogleGenAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey: userApiKey });
 
         // Configure the request
         const config = {
