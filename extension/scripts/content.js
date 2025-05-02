@@ -492,6 +492,24 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
     const contentContainer = document.createElement("div");
     contentContainer.className = "textwarden-popup-content";
 
+    // Create Apply All button at the top of the popup
+    if (suggestions.length > 1) {
+        const applyAllContainer = document.createElement("div");
+        applyAllContainer.className = "textwarden-apply-all-container";
+
+        const applyAllButton = document.createElement("button");
+        applyAllButton.className = "textwarden-apply-all-button";
+        applyAllButton.textContent = "Apply All Suggestions";
+        applyAllButton.title = "Apply all suggestions at once";
+        applyAllButton.addEventListener("click", () => {
+            applyAllSuggestions(element, suggestions);
+            suggestionPopup.style.display = "none";
+        });
+
+        applyAllContainer.appendChild(applyAllButton);
+        contentContainer.appendChild(applyAllContainer);
+    }
+
     // Create suggestions list
     const list = document.createElement("ul");
     list.className = "textwarden-suggestions-list";
@@ -694,6 +712,67 @@ const applySuggestion = (element, suggestion) => {
         issueText: issueText,
         replacementText: replacementText,
         newText: newText,
+    });
+
+    return newText; // Return the new text for chaining
+};
+
+// Apply all suggestions to a text field
+const applyAllSuggestions = (element, suggestions) => {
+    if (!element || !suggestions || suggestions.length === 0) return;
+
+    // Sort suggestions by their position in the text (from end to beginning)
+    // This prevents position shifts when applying multiple suggestions
+    const sortedSuggestions = [...suggestions].sort((a, b) => {
+        const textContent = element.value || element.textContent || "";
+        const posA = textContent.indexOf(a.issue);
+        const posB = textContent.indexOf(b.issue);
+        return posB - posA; // Sort in reverse order (end to beginning)
+    });
+
+    // Apply each suggestion in reverse order
+    let currentText = element.value || element.textContent || "";
+    let appliedCount = 0;
+
+    for (const suggestion of sortedSuggestions) {
+        if (!suggestion.issue || !suggestion.suggestion) continue;
+
+        // Replace the issue text with the suggested text
+        currentText = currentText.replace(
+            suggestion.issue,
+            suggestion.suggestion
+        );
+        appliedCount++;
+    }
+
+    // Apply the final text to the element
+    if (
+        element.tagName.toLowerCase() === "textarea" ||
+        (element.tagName.toLowerCase() === "input" &&
+            (element.type === "text" || element.type === "email"))
+    ) {
+        // For input/textarea elements
+        element.value = currentText;
+    } else if (element.getAttribute("contenteditable") === "true") {
+        // For contenteditable elements
+        element.textContent = currentText;
+    }
+
+    // Trigger input event to notify other scripts of the change
+    const inputEvent = new Event("input", { bubbles: true });
+    element.dispatchEvent(inputEvent);
+
+    // Remove all highlights
+    removeHighlights(element);
+
+    // Update statistics for each applied suggestion
+    for (let i = 0; i < appliedCount; i++) {
+        updateCorrectionCount();
+    }
+
+    console.log(`Applied ${appliedCount} suggestions:`, {
+        element: element,
+        finalText: currentText,
     });
 };
 
