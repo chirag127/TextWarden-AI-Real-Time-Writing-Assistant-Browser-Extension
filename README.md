@@ -6,6 +6,10 @@
 
 TextWarden is an AI-powered writing assistant browser extension that provides real-time grammar, spelling, style, and clarity suggestions across the web. It analyzes text in input fields (e.g., emails, social media posts, forms) and offers actionable feedback to improve communication, acting as a lightweight, privacy-focused alternative to tools like Grammarly.
 
+## 🚀 Live Demo
+
+Visit our [TextWarden Website](https://chirag127.github.io/TextWarden/) to learn more about the extension and its features.
+
 ## 🚀 Key Features
 
 -   **Real-time Grammar & Spelling Checks**: Get instant feedback on your writing without disrupting your workflow
