@@ -44,21 +44,23 @@
     max-height: 400px;
     background-color: #ffffff; /* Lighter background for better contrast */
     color: #333333; /* Darker text for better contrast */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
     display: none;
     overflow: auto; /* Ensure content is scrollable if it exceeds max-height */
     /* Add a subtle animation for better user experience */
-    animation: textwarden-popup-fade-in 0.2s ease-out;
+    animation: textwarden-popup-fade-in 0.15s ease-out;
     border: 1px solid #dddddd; /* Add border for better definition */
+    margin-top: -2px; /* Negative margin to bring it closer to the element */
+    transform-origin: top center; /* Set transform origin to top for better animation */
 }
 
 @keyframes textwarden-popup-fade-in {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(3px); /* Reduced movement for closer appearance */
     }
     to {
         opacity: 1;

@@ -345,9 +345,12 @@ const createHighlightOverlay = (element, text, suggestions) => {
             const tempTarget = document.createElement("div");
             tempTarget.style.position = "absolute";
             tempTarget.style.left = `${markerRect.left - wrapperRect.left}px`;
-            tempTarget.style.top = `${markerRect.top - wrapperRect.top}px`;
+            // Position at the bottom of the marker for closer popup placement
+            tempTarget.style.top = `${
+                markerRect.top + markerRect.height - wrapperRect.top
+            }px`;
             tempTarget.style.width = `${markerRect.width}px`;
-            tempTarget.style.height = `${markerRect.height}px`;
+            tempTarget.style.height = `0px`; // Zero height to position exactly at the bottom
             tempTarget.style.visibility = "hidden";
             wrapper.appendChild(tempTarget);
 
@@ -430,8 +433,26 @@ const highlightContentEditable = (element, _, suggestions) => {
 
         // If there are markers, use the first one as the target for positioning
         if (markers.length > 0) {
-            // Use the first marker for positioning
-            targetElement = markers[0];
+            // Get the marker's position
+            const markerRect = markers[0].getBoundingClientRect();
+
+            // Create a temporary element for precise positioning
+            const tempTarget = document.createElement("div");
+            tempTarget.style.position = "absolute";
+            tempTarget.style.left = `${markerRect.left}px`;
+            tempTarget.style.top = `${markerRect.bottom}px`; // Position at the bottom of the marker
+            tempTarget.style.width = `${markerRect.width}px`;
+            tempTarget.style.height = "0px"; // Zero height for exact positioning
+            tempTarget.style.visibility = "hidden";
+            document.body.appendChild(tempTarget);
+
+            // Use this temporary element for positioning
+            targetElement = tempTarget;
+
+            // Set up cleanup after positioning
+            setTimeout(() => {
+                document.body.removeChild(tempTarget);
+            }, 200);
 
             // Show the popup with a slight delay to ensure the highlighting is complete
             setTimeout(() => {
@@ -754,8 +775,8 @@ const calculatePopupPosition = (element) => {
         x = Math.max(0, rect.right - popupWidth);
     }
 
-    // Always position below the element
-    const y = rect.bottom + 5; // 5px below the element
+    // Always position directly below the element
+    const y = rect.bottom; // Directly below the element with no gap
 
     return { x, y };
 };
