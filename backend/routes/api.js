@@ -31,7 +31,7 @@ router.get("/health", (req, res) => {
 router.post("/ai/suggest", async (req, res) => {
     const { text, checks } = req.body;
     // Retrieve key securely from header
-    const userApiKey = req.headers["x-user-api-key"];
+    const userApiKey = req.headers["X-User-API-Key"];
 
     // Validate input
     if (!text) {

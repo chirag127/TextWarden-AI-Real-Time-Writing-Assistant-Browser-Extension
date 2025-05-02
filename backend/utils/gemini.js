@@ -89,34 +89,59 @@ RESPONSE (valid JSON array only and don't include the \`\`\`json\` and \`\`\`):`
 
         // Adjust based on whether streaming or single response is needed per feature
         const response = await ai.models.generateContent({
-          model,
+            model,
             contents,
-          config,
+            config,
         });
+
+        console.log("Raw response from Gemini API:", response);
 
         // Get the response text
         const responseText = response.text;
+        console.log("Raw response from Gemini API:", responseText);
 
         // Parse the JSON response
         let suggestions;
         try {
             // Try to parse the response as JSON
-            suggestions = JSON.parse(responseText.trim());
+            suggestions = responseText.trim();
 
             // Ensure it's an array
             if (!Array.isArray(suggestions)) {
-                suggestions = [];
                 console.error(
                     "Response was not a valid JSON array:",
                     responseText
                 );
+            // If it's not an array but a valid JSON object, wrap it in an array
+            if (typeof suggestions === "object" && suggestions !== null) {
+                suggestions = [suggestions];
+            }
+
+                return suggestions;
             }
         } catch (parseError) {
             console.error("Error parsing JSON response:", parseError.message);
             console.error("Raw response:", responseText);
 
-            // Return a fallback empty array if parsing fails
-            suggestions = [];
+            // Try to extract JSON from the response if it contains other text
+            try {
+                const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                    const jsonStr = jsonMatch[0];
+                    suggestions = JSON.parse(jsonStr);
+                    if (!Array.isArray(suggestions)) {
+                        suggestions = [];
+                    }
+                } else {
+                    suggestions = [];
+                }
+            } catch (extractError) {
+                console.error(
+                    "Error extracting JSON from response:",
+                    extractError.message
+                );
+                suggestions = [];
+            }
         }
 
         // Return successful suggestion
