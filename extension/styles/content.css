@@ -99,9 +99,27 @@
 .textwarden-item-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 8px;
     position: relative;
+}
+
+/* Text container for issue and suggestion */
+.textwarden-text-container {
+    flex-grow: 1;
+    margin: 0 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Issue text */
+.textwarden-issue-text {
+    color: #dc3545; /* Red color for issue text */
+    font-weight: 400;
+    font-size: 14px;
+    margin-bottom: 4px;
+    text-decoration: line-through; /* Strike through to show it's the text to be replaced */
+    opacity: 0.8; /* Slightly transparent to de-emphasize */
 }
 
 /* Small apply button */
@@ -120,6 +138,7 @@
     margin-right: 8px;
     transition: background-color 0.3s;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+    flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .textwarden-small-apply-button:hover {
@@ -142,6 +161,7 @@
     margin-left: 8px;
     transition: all 0.3s;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .textwarden-info-button:hover {
@@ -153,7 +173,6 @@
 .textwarden-header-text {
     color: #006400; /* Darker green for better contrast */
     font-weight: 600; /* Bolder text for better visibility */
-    flex-grow: 1;
     font-size: 15px; /* Slightly larger font */
 }
 

@@ -515,12 +515,25 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
         });
         itemHeader.appendChild(smallApplyButton);
 
-        // Suggestion text in the header (instead of issue text)
-        const headerText = document.createElement("div");
-        headerText.className = "textwarden-header-text";
-        headerText.textContent =
+        // Create a container for the issue and suggestion text
+        const textContainer = document.createElement("div");
+        textContainer.className = "textwarden-text-container";
+
+        // Add the issue text
+        const issueText = document.createElement("div");
+        issueText.className = "textwarden-issue-text";
+        issueText.textContent = suggestion.issue || "No issue text available";
+        textContainer.appendChild(issueText);
+
+        // Add the suggestion text
+        const suggestionText = document.createElement("div");
+        suggestionText.className = "textwarden-header-text";
+        suggestionText.textContent =
             suggestion.suggestion || "No suggestion available";
-        itemHeader.appendChild(headerText);
+        textContainer.appendChild(suggestionText);
+
+        // Add the text container to the header
+        itemHeader.appendChild(textContainer);
 
         // Type badge
         const typeBadge = document.createElement("span");
@@ -764,9 +777,11 @@ const calculatePopupPosition = (element) => {
 
     // Get the viewport dimensions
     const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
     // Define the popup dimensions (approximate)
     const popupWidth = 300; // Width of the popup
+    const popupHeight = 200; // Approximate height of the popup
 
     // Calculate x position (keep popup aligned with the input field)
     let x = rect.left;
@@ -775,8 +790,14 @@ const calculatePopupPosition = (element) => {
         x = Math.max(0, rect.right - popupWidth);
     }
 
-    // Always position directly below the element
-    const y = rect.bottom; // Directly below the element with no gap
+    // Calculate y position
+    let y = rect.bottom + 5; // Position below the element with a small gap
+
+    // Check if the popup would go off the bottom of the viewport
+    if (y + popupHeight > viewportHeight) {
+        // Position above the element instead
+        y = Math.max(0, rect.top - popupHeight - 5);
+    }
 
     return { x, y };
 };
