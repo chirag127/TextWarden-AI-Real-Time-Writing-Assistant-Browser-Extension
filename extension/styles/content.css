@@ -129,9 +129,9 @@
     color: #f8f9fa;
 }
 
-/* Issue text */
-.textwarden-issue-text {
-    color: #ff006e;
+/* Header text (suggestion) */
+.textwarden-header-text {
+    color: #38b000;
     font-weight: 500;
     flex-grow: 1;
 }
@@ -217,11 +217,12 @@
     border-left-color: #3a86ff;
 }
 
-/* Suggestion text */
-.textwarden-suggestion-text {
-    color: #38b000;
+/* Issue text */
+.textwarden-issue-text {
+    color: #ff006e;
     margin-bottom: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-style: italic;
 }
 
 /* Inline issue markers for contenteditable elements */
