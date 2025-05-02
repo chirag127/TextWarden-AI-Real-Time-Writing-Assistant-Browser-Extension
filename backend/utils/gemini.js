@@ -60,7 +60,7 @@ Analyze the following text for ${checkTypesText} issues. For each issue you find
 3. A brief explanation of the issue
 4. A suggested correction
 
-Format your response as a valid JSON array of objects with the following structure:
+IMPORTANT: Your response must be ONLY a valid JSON array of objects with the following structure:
 [
   {
     "issue": "problematic text",
@@ -73,12 +73,15 @@ Format your response as a valid JSON array of objects with the following structu
 
 If you find no issues, return an empty array: []
 
+Do not include any explanations, markdown formatting, or code block markers (like \`\`\`json or \`\`\`).
+Your entire response must be a valid JSON array that can be parsed directly with JSON.parse().
+
 TEXT TO ANALYZE:
 """
 ${userInputText}
 """
 
-RESPONSE (valid JSON array only and don't include the \`\`\`json\` and \`\`\`):`;
+RESPONSE (ONLY the JSON array):`;
 
         const contents = [
             {
@@ -101,47 +104,126 @@ RESPONSE (valid JSON array only and don't include the \`\`\`json\` and \`\`\`):`
         console.log("Raw response from Gemini API:", responseText);
 
         // Parse the JSON response
-        let suggestions;
+        let suggestions = [];
+
         try {
-            // Try to parse the response as JSON
-            suggestions = responseText.trim();
-
-            // Ensure it's an array
-            if (!Array.isArray(suggestions)) {
-                console.error(
-                    "Response was not a valid JSON array:",
-                    responseText
-                );
-            // If it's not an array but a valid JSON object, wrap it in an array
-            if (typeof suggestions === "object" && suggestions !== null) {
-                suggestions = [suggestions];
-            }
-
-                return suggestions;
-            }
-        } catch (parseError) {
-            console.error("Error parsing JSON response:", parseError.message);
-            console.error("Raw response:", responseText);
-
-            // Try to extract JSON from the response if it contains other text
+            // First, try to parse the entire response as JSON
             try {
-                const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-                if (jsonMatch) {
-                    const jsonStr = jsonMatch[0];
-                    suggestions = JSON.parse(jsonStr);
-                    if (!Array.isArray(suggestions)) {
-                        suggestions = [];
-                    }
-                } else {
-                    suggestions = [];
+                const parsedJson = JSON.parse(responseText.trim());
+                if (Array.isArray(parsedJson)) {
+                    suggestions = parsedJson;
+                    console.log("Successfully parsed response as JSON array");
+                } else if (
+                    typeof parsedJson === "object" &&
+                    parsedJson !== null
+                ) {
+                    suggestions = [parsedJson];
+                    console.log(
+                        "Parsed response as single JSON object, wrapped in array"
+                    );
                 }
-            } catch (extractError) {
-                console.error(
-                    "Error extracting JSON from response:",
-                    extractError.message
+            } catch (directParseError) {
+                console.log(
+                    "Direct JSON parsing failed, trying alternative methods"
                 );
-                suggestions = [];
+
+                // Try to extract JSON array from the response
+                const arrayMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (arrayMatch) {
+                    try {
+                        const arrayStr = arrayMatch[0];
+                        console.log(
+                            "Extracted potential JSON array:",
+                            arrayStr
+                        );
+                        const parsedArray = JSON.parse(arrayStr);
+                        if (Array.isArray(parsedArray)) {
+                            suggestions = parsedArray;
+                            console.log(
+                                "Successfully parsed extracted JSON array"
+                            );
+                        }
+                    } catch (arrayParseError) {
+                        console.error(
+                            "Error parsing extracted array:",
+                            arrayParseError.message
+                        );
+                    }
+                }
+
+                // If still no valid suggestions, try to find individual JSON objects
+                if (suggestions.length === 0) {
+                    const objectMatches = responseText.match(/\{[\s\S]*?\}/g);
+                    if (objectMatches && objectMatches.length > 0) {
+                        console.log(
+                            "Found potential JSON objects:",
+                            objectMatches.length
+                        );
+                        for (const match of objectMatches) {
+                            try {
+                                const obj = JSON.parse(match);
+                                if (typeof obj === "object" && obj !== null) {
+                                    suggestions.push(obj);
+                                    console.log(
+                                        "Added valid JSON object to suggestions"
+                                    );
+                                }
+                            } catch (objParseError) {
+                                // Skip invalid objects
+                            }
+                        }
+                    }
+                }
             }
+
+            // If we still have no suggestions, try one more approach
+            if (suggestions.length === 0) {
+                // Remove any markdown code block markers
+                const cleanedText = responseText
+                    .replace(/```json|```/g, "")
+                    .trim();
+                try {
+                    const parsedClean = JSON.parse(cleanedText);
+                    if (Array.isArray(parsedClean)) {
+                        suggestions = parsedClean;
+                        console.log(
+                            "Successfully parsed cleaned response as JSON array"
+                        );
+                    } else if (
+                        typeof parsedClean === "object" &&
+                        parsedClean !== null
+                    ) {
+                        suggestions = [parsedClean];
+                        console.log(
+                            "Parsed cleaned response as single JSON object"
+                        );
+                    }
+                } catch (cleanParseError) {
+                    console.error(
+                        "Error parsing cleaned text:",
+                        cleanParseError.message
+                    );
+                }
+            }
+        } catch (error) {
+            console.error("All JSON parsing attempts failed:", error.message);
+            console.error("Raw response:", responseText);
+            suggestions = [];
+        }
+
+        // If we still have no suggestions, create a fallback suggestion
+        if (suggestions.length === 0) {
+            console.warn("Creating fallback suggestion from raw text");
+            suggestions = [
+                {
+                    issue: "Could not parse response",
+                    type: "general",
+                    explanation: "The AI response could not be parsed as JSON",
+                    suggestion:
+                        responseText.substring(0, 200) +
+                        (responseText.length > 200 ? "..." : ""),
+                },
+            ];
         }
 
         // Return successful suggestion
