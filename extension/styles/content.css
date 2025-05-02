@@ -17,7 +17,6 @@
     z-index: 999999;
     width: 300px;
     max-height: 400px;
-    overflow-y: auto;
     background-color: #212529;
     color: #f8f9fa;
     border-radius: 8px;
@@ -27,13 +26,12 @@
     display: none;
 }
 
-/* Popup header */
-.textwarden-popup-header {
-    padding: 12px 16px;
-    background-color: #3a86ff;
-    color: white;
-    font-weight: 600;
-    border-radius: 8px 8px 0 0;
+/* Popup content container */
+.textwarden-popup-content {
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
 }
 
 /* Suggestions list */
@@ -104,10 +102,53 @@
 
 /* Explanation text */
 .textwarden-explanation-text {
-    color: #6c757d;
-    margin-bottom: 8px;
-    font-size: 12px;
-    line-height: 1.4;
+    color: #f8f9fa;
+    background-color: rgba(108, 117, 125, 0.2);
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 3px solid #6c757d;
+}
+
+/* Type container */
+.textwarden-type-container {
+    margin-bottom: 10px;
+}
+
+.textwarden-type-container .textwarden-type-badge {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+/* Type-specific explanation styling */
+.textwarden-type-container
+    .textwarden-type-grammar
+    ~ .textwarden-explanation-text {
+    background-color: rgba(255, 0, 110, 0.1);
+    border-left-color: #ff006e;
+}
+
+.textwarden-type-container
+    .textwarden-type-spelling
+    ~ .textwarden-explanation-text {
+    background-color: rgba(255, 190, 11, 0.1);
+    border-left-color: #ffbe0b;
+}
+
+.textwarden-type-container
+    .textwarden-type-style
+    ~ .textwarden-explanation-text {
+    background-color: rgba(131, 56, 236, 0.1);
+    border-left-color: #8338ec;
+}
+
+.textwarden-type-container
+    .textwarden-type-clarity
+    ~ .textwarden-explanation-text {
+    background-color: rgba(58, 134, 255, 0.1);
+    border-left-color: #3a86ff;
 }
 
 /* Suggestion text */

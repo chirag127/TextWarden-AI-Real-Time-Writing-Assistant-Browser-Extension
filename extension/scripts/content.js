@@ -309,17 +309,15 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
     // Clear previous content
     suggestionPopup.innerHTML = "";
 
-    // Create header
-    const header = document.createElement("div");
-    header.className = "textwarden-popup-header";
-    header.textContent = "TextWarden Suggestions";
-    suggestionPopup.appendChild(header);
+    // Create content container (we'll skip the header to improve scrolling)
+    const contentContainer = document.createElement("div");
+    contentContainer.className = "textwarden-popup-content";
 
     // Create suggestions list
     const list = document.createElement("ul");
     list.className = "textwarden-suggestions-list";
 
-    suggestions.forEach((suggestion, index) => {
+    suggestions.forEach((suggestion) => {
         const item = document.createElement("li");
         item.className = "textwarden-suggestion-item";
 
@@ -340,10 +338,37 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
         typeBadge.textContent = issueType;
         itemHeader.appendChild(typeBadge);
 
-        // Add explanation if available
+        // Always show explanation (with default text if none provided)
         const explanationText = document.createElement("div");
         explanationText.className = "textwarden-explanation-text";
-        explanationText.textContent = suggestion.explanation || "";
+
+        // Get default explanation based on issue type if none provided
+        let explanation = suggestion.explanation;
+        if (!explanation || explanation.trim() === "") {
+            const issueType = suggestion.type || "general";
+            switch (issueType) {
+                case "grammar":
+                    explanation =
+                        "This appears to be a grammatical error that affects sentence structure.";
+                    break;
+                case "spelling":
+                    explanation =
+                        "This word may be misspelled or not recognized.";
+                    break;
+                case "style":
+                    explanation =
+                        "This phrasing could be improved for better readability or clarity.";
+                    break;
+                case "clarity":
+                    explanation =
+                        "This text may be confusing or ambiguous to readers.";
+                    break;
+                default:
+                    explanation =
+                        "This text could be improved for better writing quality.";
+            }
+        }
+        explanationText.textContent = explanation;
 
         // Suggestion text
         const suggestionText = document.createElement("div");
@@ -360,17 +385,25 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
             suggestionPopup.style.display = "none";
         });
 
+        // Create a container for the type badge and explanation to enable CSS sibling selector
+        const typeContainer = document.createElement("div");
+        typeContainer.className = "textwarden-type-container";
+        typeContainer.appendChild(typeBadge.cloneNode(true)); // Clone the badge to place it here too
+        typeContainer.appendChild(explanationText);
+
         // Add all elements to the item
         item.appendChild(itemHeader);
-        if (suggestion.explanation) {
-            item.appendChild(explanationText);
-        }
+        item.appendChild(typeContainer); // Add type container with badge and explanation
         item.appendChild(suggestionText);
         item.appendChild(applyButton);
         list.appendChild(item);
     });
 
-    suggestionPopup.appendChild(list);
+    // Add list to content container
+    contentContainer.appendChild(list);
+
+    // Add content container to popup
+    suggestionPopup.appendChild(contentContainer);
 
     // Position the popup
     suggestionPopup.style.left = `${x}px`;
@@ -396,14 +429,62 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
 
 // Apply a suggestion to a text field
 const applySuggestion = (element, suggestion) => {
-    // Implementation depends on the element type and suggestion type
-    console.log("Would apply suggestion", suggestion, "to", element);
+    if (!element || !suggestion || !suggestion.suggestion) return;
 
-    // For now, just log it
-    // In a real extension, this would modify the text in the element
+    // Get the current text from the element
+    let currentText = element.value || element.textContent || "";
+
+    // Get the issue text and suggested replacement
+    const issueText = suggestion.issue || "";
+    const replacementText = suggestion.suggestion || "";
+
+    if (!issueText || !replacementText) {
+        console.error(
+            "Missing issue text or replacement text in suggestion:",
+            suggestion
+        );
+        return;
+    }
+
+    // Replace the issue text with the suggested text
+    // Note: In a real implementation, you would need more sophisticated logic
+    // to handle exact positions, partial matches, etc.
+    const newText = currentText.replace(issueText, replacementText);
+
+    // Apply the new text to the element based on its type
+    if (
+        element.tagName.toLowerCase() === "textarea" ||
+        (element.tagName.toLowerCase() === "input" &&
+            (element.type === "text" || element.type === "email"))
+    ) {
+        // For input/textarea elements
+        element.value = newText;
+
+        // Trigger input event to notify other scripts of the change
+        const inputEvent = new Event("input", { bubbles: true });
+        element.dispatchEvent(inputEvent);
+    } else if (element.getAttribute("contenteditable") === "true") {
+        // For contenteditable elements
+        element.textContent = newText;
+
+        // Trigger input event
+        const inputEvent = new Event("input", { bubbles: true });
+        element.dispatchEvent(inputEvent);
+    }
+
+    // Remove the highlight for this issue
+    removeHighlights(element);
 
     // Update statistics
     updateCorrectionCount();
+
+    console.log("Applied suggestion:", {
+        element: element,
+        originalText: currentText,
+        issueText: issueText,
+        replacementText: replacementText,
+        newText: newText,
+    });
 };
 
 // Remove highlights from an element
