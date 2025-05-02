@@ -97,7 +97,6 @@ RESPONSE (ONLY the JSON array):`;
             config,
         });
 
-
         // Get the response text
         const responseText = response.text;
         console.log("Raw response from Gemini API:", responseText);
@@ -213,16 +212,7 @@ RESPONSE (ONLY the JSON array):`;
         // If we still have no suggestions, create a fallback suggestion
         if (suggestions.length === 0) {
             console.warn("Creating fallback suggestion from raw text");
-            suggestions = [
-                {
-                    issue: "Could not parse response",
-                    type: "general",
-                    explanation: "The AI response could not be parsed as JSON",
-                    suggestion:
-                        responseText.substring(0, 200) +
-                        (responseText.length > 200 ? "..." : ""),
-                },
-            ];
+            suggestions = [];
         }
 
         // Return successful suggestion

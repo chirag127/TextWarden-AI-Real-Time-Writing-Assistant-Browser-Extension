@@ -6,14 +6,39 @@
  * @author Chirag Singhal (chirag127)
  */
 
-/* Highlight for text fields with issues */
-.textwarden-has-issues {
+/* Highlight wrapper for text fields */
+.textwarden-highlight-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Highlight marker for specific issue text */
+.textwarden-issue-marker {
+    position: absolute;
     border-bottom: 2px dotted #ff006e !important;
+    pointer-events: none; /* Allow clicks to pass through to the underlying text */
+}
+
+/* Type-specific issue markers */
+.textwarden-issue-marker.grammar {
+    border-bottom-color: #ff006e !important;
+}
+
+.textwarden-issue-marker.spelling {
+    border-bottom-color: #ffbe0b !important;
+}
+
+.textwarden-issue-marker.style {
+    border-bottom-color: #8338ec !important;
+}
+
+.textwarden-issue-marker.clarity {
+    border-bottom-color: #3a86ff !important;
 }
 
 /* Suggestion popup */
 .textwarden-suggestion-popup {
-    position: absolute;
+    position: fixed; /* Changed to fixed to ensure it's visible in the viewport */
     z-index: 999999;
     width: 300px;
     max-height: 400px;
@@ -24,6 +49,7 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
     display: none;
+    overflow: auto; /* Ensure content is scrollable if it exceeds max-height */
 }
 
 /* Popup content container */
@@ -45,18 +71,62 @@
 .textwarden-suggestion-item {
     padding: 12px 16px;
     border-bottom: 1px solid #343a40;
+    position: relative;
 }
 
 .textwarden-suggestion-item:last-child {
     border-bottom: none;
 }
 
-/* Item header with issue text and type badge */
+/* Item header with apply button, issue text, type badge, and info button */
 .textwarden-item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+    position: relative;
+}
+
+/* Small apply button */
+.textwarden-small-apply-button {
+    background-color: #38b000;
+    color: white;
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    transition: background-color 0.3s;
+}
+
+.textwarden-small-apply-button:hover {
+    background-color: #2d8a00;
+}
+
+/* Info button */
+.textwarden-info-button {
+    background-color: transparent;
+    color: #6c757d;
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: color 0.3s;
+}
+
+.textwarden-info-button:hover {
+    color: #f8f9fa;
 }
 
 /* Issue text */
@@ -100,54 +170,50 @@
     color: #6c757d;
 }
 
-/* Explanation text */
-.textwarden-explanation-text {
+/* Explanation tooltip */
+.textwarden-explanation-tooltip {
+    position: absolute;
+    /* top and right are set dynamically in JS */
+    width: 250px;
+    background-color: #343a40;
     color: #f8f9fa;
-    background-color: rgba(108, 117, 125, 0.2);
-    padding: 8px 10px;
+    padding: 10px 12px;
     border-radius: 4px;
-    margin-bottom: 10px;
     font-size: 13px;
     line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000000;
+    display: none;
     border-left: 3px solid #6c757d;
 }
 
-/* Type container */
-.textwarden-type-container {
-    margin-bottom: 10px;
+/* Add a small arrow to the tooltip */
+.textwarden-explanation-tooltip::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #343a40;
 }
 
-.textwarden-type-container .textwarden-type-badge {
-    display: inline-block;
-    margin-bottom: 5px;
-}
-
-/* Type-specific explanation styling */
-.textwarden-type-container
-    .textwarden-type-grammar
-    ~ .textwarden-explanation-text {
-    background-color: rgba(255, 0, 110, 0.1);
+/* Type-specific tooltip styling */
+.textwarden-type-grammar ~ .textwarden-explanation-tooltip {
     border-left-color: #ff006e;
 }
 
-.textwarden-type-container
-    .textwarden-type-spelling
-    ~ .textwarden-explanation-text {
-    background-color: rgba(255, 190, 11, 0.1);
+.textwarden-type-spelling ~ .textwarden-explanation-tooltip {
     border-left-color: #ffbe0b;
 }
 
-.textwarden-type-container
-    .textwarden-type-style
-    ~ .textwarden-explanation-text {
-    background-color: rgba(131, 56, 236, 0.1);
+.textwarden-type-style ~ .textwarden-explanation-tooltip {
     border-left-color: #8338ec;
 }
 
-.textwarden-type-container
-    .textwarden-type-clarity
-    ~ .textwarden-explanation-text {
-    background-color: rgba(58, 134, 255, 0.1);
+.textwarden-type-clarity ~ .textwarden-explanation-tooltip {
     border-left-color: #3a86ff;
 }
 
@@ -158,35 +224,26 @@
     font-weight: 500;
 }
 
-/* Apply button */
-.textwarden-apply-button {
-    background-color: #3a86ff;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s;
+/* Inline issue markers for contenteditable elements */
+span.textwarden-issue-marker {
+    border-bottom: 2px dotted #ff006e;
+    background-color: transparent;
+    display: inline;
+    position: relative;
 }
 
-.textwarden-apply-button:hover {
-    background-color: #2a75e8;
+span.textwarden-issue-marker.grammar {
+    border-bottom-color: #ff006e;
 }
 
-/* Highlight types */
-.textwarden-grammar-issue {
-    border-bottom: 2px dotted #ff006e !important;
+span.textwarden-issue-marker.spelling {
+    border-bottom-color: #ffbe0b;
 }
 
-.textwarden-spelling-issue {
-    border-bottom: 2px dotted #ffbe0b !important;
+span.textwarden-issue-marker.style {
+    border-bottom-color: #8338ec;
 }
 
-.textwarden-style-issue {
-    border-bottom: 2px dotted #8338ec !important;
-}
-
-.textwarden-clarity-issue {
-    border-bottom: 2px dotted #3a86ff !important;
+span.textwarden-issue-marker.clarity {
+    border-bottom-color: #3a86ff;
 }

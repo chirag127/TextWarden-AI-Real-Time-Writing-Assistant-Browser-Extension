@@ -248,58 +248,154 @@ const addHighlights = (element, text, suggestions) => {
 
 // Create highlight overlay for input/textarea elements
 const createHighlightOverlay = (element, text, suggestions) => {
-    // This is a simplified implementation
-    // In a real extension, this would be more complex to handle scrolling, positioning, etc.
-    console.log(
-        "Would create highlight overlay for",
-        element,
-        "with suggestions:",
-        suggestions
-    );
+    // Remove any existing highlights
+    removeHighlights(element);
 
-    // For now, just add a class to indicate there are issues
-    element.classList.add("textwarden-has-issues");
+    // Create a wrapper for the element if it doesn't exist
+    let wrapper = element.parentElement;
+    if (
+        !wrapper ||
+        !wrapper.classList.contains("textwarden-highlight-wrapper")
+    ) {
+        // Create a wrapper div
+        wrapper = document.createElement("div");
+        wrapper.className = "textwarden-highlight-wrapper";
 
-    // Add click event to show suggestions
-    element.addEventListener("click", (event) => {
-        const suggestions = highlightedIssues.get(element);
-        if (suggestions && suggestions.length > 0) {
-            showSuggestionPopup(
-                element,
-                event.clientX,
-                event.clientY,
-                suggestions
-            );
-        }
+        // Set the wrapper's style to match the element's dimensions
+        const elementStyle = window.getComputedStyle(element);
+        wrapper.style.width = elementStyle.width;
+        wrapper.style.height = elementStyle.height;
+        wrapper.style.display = "inline-block";
+        wrapper.style.position = "relative";
+
+        // Insert the wrapper in the DOM
+        element.parentNode.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+    }
+
+    // Get the element's text content
+    const elementText = text;
+
+    // Create markers for each issue
+    suggestions.forEach((suggestion, index) => {
+        const issueText = suggestion.issue;
+        if (!issueText) return;
+
+        // Find the position of the issue text in the element's text
+        const issueIndex = elementText.indexOf(issueText);
+        if (issueIndex === -1) return;
+
+        // Create a marker for this issue
+        const marker = document.createElement("div");
+        marker.className = `textwarden-issue-marker ${
+            suggestion.type || "general"
+        }`;
+        marker.setAttribute("data-issue-index", index);
+
+        // Position the marker over the issue text
+        // This is a simplified approach - in a real extension, you would need more sophisticated positioning
+        const textBeforeIssue = elementText.substring(0, issueIndex);
+
+        // Create a temporary span to measure text width
+        const measureSpan = document.createElement("span");
+        measureSpan.style.visibility = "hidden";
+        measureSpan.style.position = "absolute";
+        measureSpan.style.whiteSpace = "pre";
+        measureSpan.style.font = window.getComputedStyle(element).font;
+        document.body.appendChild(measureSpan);
+
+        // Measure the width of the text before the issue
+        measureSpan.textContent = textBeforeIssue;
+        const offsetLeft = measureSpan.offsetWidth;
+
+        // Measure the width of the issue text
+        measureSpan.textContent = issueText;
+        const issueWidth = measureSpan.offsetWidth;
+
+        // Clean up
+        document.body.removeChild(measureSpan);
+
+        // Set the marker's position and dimensions
+        marker.style.left = `${offsetLeft}px`;
+        marker.style.bottom = "0";
+        marker.style.width = `${issueWidth}px`;
+        marker.style.height = "2px";
+
+        // Add the marker to the wrapper
+        wrapper.appendChild(marker);
     });
+
+    // Store the highlights for this element
+    highlightedIssues.set(element, suggestions);
+
+    // Show the popup automatically near the first issue
+    if (suggestions && suggestions.length > 0) {
+        // Get the element's position
+        const rect = element.getBoundingClientRect();
+
+        // Position the popup near the element
+        const popupX = rect.left;
+        const popupY = rect.bottom + 5; // 5px below the element
+
+        // Show the popup with a slight delay to ensure the highlighting is complete
+        setTimeout(() => {
+            showSuggestionPopup(element, popupX, popupY, suggestions);
+        }, 100);
+    }
 };
 
 // Highlight issues in contenteditable elements
 const highlightContentEditable = (element, text, suggestions) => {
-    // This is a simplified implementation
-    // In a real extension, this would use a more sophisticated approach
-    console.log(
-        "Would highlight contenteditable",
-        element,
-        "with suggestions:",
-        suggestions
-    );
+    // We don't need the text parameter for contenteditable elements as we use innerHTML
+    // Remove any existing highlights
+    removeHighlights(element);
 
-    // For now, just add a class to indicate there are issues
-    element.classList.add("textwarden-has-issues");
+    // Get the original HTML content
+    let html = element.innerHTML;
 
-    // Add click event to show suggestions
-    element.addEventListener("click", (event) => {
-        const suggestions = highlightedIssues.get(element);
-        if (suggestions && suggestions.length > 0) {
-            showSuggestionPopup(
-                element,
-                event.clientX,
-                event.clientY,
-                suggestions
-            );
-        }
+    // Process each suggestion
+    suggestions.forEach((suggestion) => {
+        const issueText = suggestion.issue;
+        if (!issueText) return;
+
+        // Escape the issue text for use in a regex
+        const escapedIssueText = issueText.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
+
+        // Create a regex to find the issue text
+        const regex = new RegExp(escapedIssueText, "g");
+
+        // Replace the issue text with a highlighted version
+        html = html.replace(
+            regex,
+            `<span class="textwarden-issue-marker ${
+                suggestion.type || "general"
+            }">${issueText}</span>`
+        );
     });
+
+    // Update the element's HTML
+    element.innerHTML = html;
+
+    // Store the highlights for this element
+    highlightedIssues.set(element, suggestions);
+
+    // Show the popup automatically near the element
+    if (suggestions && suggestions.length > 0) {
+        // Get the element's position
+        const rect = element.getBoundingClientRect();
+
+        // Position the popup near the element
+        const popupX = rect.left;
+        const popupY = rect.bottom + 5; // 5px below the element
+
+        // Show the popup with a slight delay to ensure the highlighting is complete
+        setTimeout(() => {
+            showSuggestionPopup(element, popupX, popupY, suggestions);
+        }, 100);
+    }
 };
 
 // Show suggestion popup
@@ -321,9 +417,20 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
         const item = document.createElement("li");
         item.className = "textwarden-suggestion-item";
 
-        // Create item header with issue text and type badge
+        // Create item header with apply button, issue text, type badge, and info button
         const itemHeader = document.createElement("div");
         itemHeader.className = "textwarden-item-header";
+
+        // Small apply button on the left
+        const smallApplyButton = document.createElement("button");
+        smallApplyButton.className = "textwarden-small-apply-button";
+        smallApplyButton.innerHTML = "&#10003;"; // Checkmark symbol
+        smallApplyButton.title = "Apply this suggestion";
+        smallApplyButton.addEventListener("click", () => {
+            applySuggestion(element, suggestion);
+            suggestionPopup.style.display = "none";
+        });
+        itemHeader.appendChild(smallApplyButton);
 
         // Issue text
         const issueText = document.createElement("div");
@@ -338,9 +445,16 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
         typeBadge.textContent = issueType;
         itemHeader.appendChild(typeBadge);
 
-        // Always show explanation (with default text if none provided)
-        const explanationText = document.createElement("div");
-        explanationText.className = "textwarden-explanation-text";
+        // Info button on the right
+        const infoButton = document.createElement("button");
+        infoButton.className = "textwarden-info-button";
+        infoButton.innerHTML = "&#9432;"; // Info symbol
+        infoButton.title = "Show explanation";
+        itemHeader.appendChild(infoButton);
+
+        // Create tooltip for explanation (hidden by default)
+        const explanationTooltip = document.createElement("div");
+        explanationTooltip.className = "textwarden-explanation-tooltip";
 
         // Get default explanation based on issue type if none provided
         let explanation = suggestion.explanation;
@@ -368,7 +482,28 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
                         "This text could be improved for better writing quality.";
             }
         }
-        explanationText.textContent = explanation;
+        explanationTooltip.textContent = explanation;
+
+        // Add hover event listeners to show/hide the tooltip
+        infoButton.addEventListener("mouseenter", () => {
+            // Position the tooltip relative to the info button
+            const infoRect = infoButton.getBoundingClientRect();
+            const itemRect = item.getBoundingClientRect();
+
+            // Set tooltip position
+            explanationTooltip.style.top =
+                infoRect.bottom - itemRect.top + 5 + "px";
+            explanationTooltip.style.right = "0";
+            explanationTooltip.style.display = "block";
+        });
+
+        infoButton.addEventListener("mouseleave", () => {
+            explanationTooltip.style.display = "none";
+        });
+
+        // Add the tooltip to the item (with position: relative to enable absolute positioning)
+        item.style.position = "relative";
+        item.appendChild(explanationTooltip);
 
         // Suggestion text
         const suggestionText = document.createElement("div");
@@ -376,26 +511,9 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
         suggestionText.textContent =
             suggestion.suggestion || "No suggestion available";
 
-        // Apply button
-        const applyButton = document.createElement("button");
-        applyButton.className = "textwarden-apply-button";
-        applyButton.textContent = "Apply";
-        applyButton.addEventListener("click", () => {
-            applySuggestion(element, suggestion);
-            suggestionPopup.style.display = "none";
-        });
-
-        // Create a container for the type badge and explanation to enable CSS sibling selector
-        const typeContainer = document.createElement("div");
-        typeContainer.className = "textwarden-type-container";
-        typeContainer.appendChild(typeBadge.cloneNode(true)); // Clone the badge to place it here too
-        typeContainer.appendChild(explanationText);
-
         // Add all elements to the item
         item.appendChild(itemHeader);
-        item.appendChild(typeContainer); // Add type container with badge and explanation
         item.appendChild(suggestionText);
-        item.appendChild(applyButton);
         list.appendChild(item);
     });
 
@@ -491,8 +609,28 @@ const applySuggestion = (element, suggestion) => {
 const removeHighlights = (element) => {
     if (!element) return;
 
-    // Remove highlight class
-    element.classList.remove("textwarden-has-issues");
+    // For input/textarea elements with a wrapper
+    const wrapper = element.parentElement;
+    if (wrapper && wrapper.classList.contains("textwarden-highlight-wrapper")) {
+        // Remove all issue markers
+        const markers = wrapper.querySelectorAll(".textwarden-issue-marker");
+        markers.forEach((marker) => marker.remove());
+    }
+
+    // For contenteditable elements
+    if (element.getAttribute("contenteditable") === "true") {
+        // Get the HTML content
+        let html = element.innerHTML;
+
+        // Remove all issue marker spans
+        html = html.replace(
+            /<span class="textwarden-issue-marker [^"]*">(.*?)<\/span>/g,
+            "$1"
+        );
+
+        // Update the element's HTML
+        element.innerHTML = html;
+    }
 
     // Remove from highlighted issues map
     highlightedIssues.delete(element);
@@ -500,9 +638,19 @@ const removeHighlights = (element) => {
 
 // Remove all highlights
 const removeAllHighlights = () => {
-    // Remove highlight class from all elements
-    document.querySelectorAll(".textwarden-has-issues").forEach((element) => {
-        element.classList.remove("textwarden-has-issues");
+    // Remove all issue markers from wrappers
+    document.querySelectorAll(".textwarden-issue-marker").forEach((marker) => {
+        marker.remove();
+    });
+
+    // Remove issue marker spans from contenteditable elements
+    document.querySelectorAll("[contenteditable='true']").forEach((element) => {
+        let html = element.innerHTML;
+        html = html.replace(
+            /<span class="textwarden-issue-marker [^"]*">(.*?)<\/span>/g,
+            "$1"
+        );
+        element.innerHTML = html;
     });
 
     // Clear highlighted issues map
