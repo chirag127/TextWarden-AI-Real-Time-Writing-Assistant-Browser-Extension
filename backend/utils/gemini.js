@@ -75,6 +75,7 @@ If you find no issues, return an empty array: []
 
 Do not include any explanations, markdown formatting, or code block markers (like \`\`\`json or \`\`\`).
 Your entire response must be a valid JSON array that can be parsed directly with JSON.parse().
+if the issue text appears multiple times then make the issue text bigger until it is unique. 
 
 TEXT TO ANALYZE:
 """
