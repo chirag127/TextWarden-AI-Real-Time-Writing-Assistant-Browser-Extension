@@ -14,9 +14,14 @@ const { GoogleGenAI } = require("@google/genai");
  *
  * @param {string} userInputText - The text to analyze
  * @param {string} userApiKey - The user's Gemini API key
+ * @param {Array} checks - Types of checks to perform (grammar, spelling, style, clarity)
  * @returns {Object} - The suggestion or error
  */
-async function getGeminiSuggestion(userInputText, userApiKey) {
+async function getGeminiSuggestion(
+    userInputText,
+    userApiKey,
+    checks = ["grammar", "spelling", "style", "clarity"]
+) {
     if (!userApiKey) {
         console.error("User API Key not provided in request.");
         // Return a specific error object/message for the frontend
@@ -42,26 +47,80 @@ async function getGeminiSuggestion(userInputText, userApiKey) {
 
         // Use the model specified in the PRD
         const model = "gemini-2.5-flash-preview-04-17";
+
+        // Create a prompt based on the requested check types
+        const checkTypesText = checks.join(", ");
+
+        const promptText = `
+You are TextWarden, an AI writing assistant that analyzes text for issues and provides suggestions for improvement.
+
+Analyze the following text for ${checkTypesText} issues. For each issue you find, provide:
+1. The problematic text
+2. The type of issue (grammar, spelling, style, or clarity)
+3. A brief explanation of the issue
+4. A suggested correction
+
+Format your response as a valid JSON array of objects with the following structure:
+[
+  {
+    "issue": "problematic text",
+    "type": "issue type (grammar, spelling, style, or clarity)",
+    "explanation": "brief explanation of the issue",
+    "suggestion": "suggested correction"
+  },
+  ...
+]
+
+If you find no issues, return an empty array: []
+
+TEXT TO ANALYZE:
+"""
+${userInputText}
+"""
+
+RESPONSE (valid JSON array only and don't include the \`\`\`json\` and \`\`\`):`;
+
         const contents = [
             {
                 role: "user",
-                parts: [{ text: userInputText }],
+                parts: [{ text: promptText }],
             },
         ];
 
         // Adjust based on whether streaming or single response is needed per feature
         const response = await ai.models.generateContent({
           model,
-          contents,
+            contents,
           config,
-      });
+        });
 
-      // Collect the response chunks
-      let suggestion = response.text || ""; // Fallback to empty string if no text is returned
+        // Get the response text
+        const responseText = response.text;
 
+        // Parse the JSON response
+        let suggestions;
+        try {
+            // Try to parse the response as JSON
+            suggestions = JSON.parse(responseText.trim());
+
+            // Ensure it's an array
+            if (!Array.isArray(suggestions)) {
+                suggestions = [];
+                console.error(
+                    "Response was not a valid JSON array:",
+                    responseText
+                );
+            }
+        } catch (parseError) {
+            console.error("Error parsing JSON response:", parseError.message);
+            console.error("Raw response:", responseText);
+
+            // Return a fallback empty array if parsing fails
+            suggestions = [];
+        }
 
         // Return successful suggestion
-        return { error: false, suggestion: suggestion };
+        return { error: false, suggestion: suggestions };
     } catch (error) {
         console.error("Error calling Gemini API:", error.message); // Log error message, NOT the key
 
