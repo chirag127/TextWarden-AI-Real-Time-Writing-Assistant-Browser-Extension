@@ -38,18 +38,32 @@
 
 /* Suggestion popup */
 .textwarden-suggestion-popup {
-    position: fixed; /* Changed to fixed to ensure it's visible in the viewport */
+    position: absolute; /* Absolute positioning to ensure it's attached to the input field */
     z-index: 999999;
     width: 300px;
     max-height: 400px;
-    background-color: #212529;
-    color: #f8f9fa;
+    background-color: #ffffff; /* Lighter background for better contrast */
+    color: #333333; /* Darker text for better contrast */
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
     display: none;
     overflow: auto; /* Ensure content is scrollable if it exceeds max-height */
+    /* Add a subtle animation for better user experience */
+    animation: textwarden-popup-fade-in 0.2s ease-out;
+    border: 1px solid #dddddd; /* Add border for better definition */
+}
+
+@keyframes textwarden-popup-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Popup content container */
@@ -70,8 +84,9 @@
 /* Suggestion item */
 .textwarden-suggestion-item {
     padding: 12px 16px;
-    border-bottom: 1px solid #343a40;
+    border-bottom: 1px solid #e0e0e0; /* Lighter border for better contrast */
     position: relative;
+    background-color: #ffffff; /* Ensure consistent background */
 }
 
 .textwarden-suggestion-item:last-child {
@@ -89,32 +104,33 @@
 
 /* Small apply button */
 .textwarden-small-apply-button {
-    background-color: #38b000;
+    background-color: #006400; /* Darker green for better contrast */
     color: white;
     border: none;
-    width: 22px;
-    height: 22px;
+    width: 24px; /* Slightly larger */
+    height: 24px; /* Slightly larger */
     border-radius: 50%;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px; /* Larger font */
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 8px;
     transition: background-color 0.3s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
 }
 
 .textwarden-small-apply-button:hover {
-    background-color: #2d8a00;
+    background-color: #004d00; /* Even darker on hover */
 }
 
 /* Info button */
 .textwarden-info-button {
-    background-color: transparent;
-    color: #6c757d;
-    border: none;
-    width: 22px;
-    height: 22px;
+    background-color: #e9ecef; /* Light background instead of transparent */
+    color: #495057; /* Darker color for better contrast */
+    border: 1px solid #ced4da; /* Add border for better definition */
+    width: 24px; /* Slightly larger */
+    height: 24px; /* Slightly larger */
     border-radius: 50%;
     cursor: pointer;
     font-size: 14px;
@@ -122,18 +138,21 @@
     align-items: center;
     justify-content: center;
     margin-left: 8px;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
 }
 
 .textwarden-info-button:hover {
-    color: #f8f9fa;
+    background-color: #dee2e6; /* Slightly darker on hover */
+    color: #212529; /* Even darker text on hover */
 }
 
 /* Header text (suggestion) */
 .textwarden-header-text {
-    color: #38b000;
-    font-weight: 500;
+    color: #006400; /* Darker green for better contrast */
+    font-weight: 600; /* Bolder text for better visibility */
     flex-grow: 1;
+    font-size: 15px; /* Slightly larger font */
 }
 
 /* Type badge */
@@ -146,28 +165,33 @@
 }
 
 .textwarden-type-grammar {
-    background-color: rgba(255, 0, 110, 0.2);
-    color: #ff006e;
+    background-color: rgba(255, 0, 110, 0.15);
+    color: #d10058; /* Darker color for better contrast */
+    border: 1px solid rgba(255, 0, 110, 0.4); /* Add border for better definition */
 }
 
 .textwarden-type-spelling {
-    background-color: rgba(255, 190, 11, 0.2);
-    color: #ffbe0b;
+    background-color: rgba(255, 190, 11, 0.15);
+    color: #b27800; /* Darker color for better contrast */
+    border: 1px solid rgba(255, 190, 11, 0.4); /* Add border for better definition */
 }
 
 .textwarden-type-style {
-    background-color: rgba(131, 56, 236, 0.2);
-    color: #8338ec;
+    background-color: rgba(131, 56, 236, 0.15);
+    color: #5c1cb0; /* Darker color for better contrast */
+    border: 1px solid rgba(131, 56, 236, 0.4); /* Add border for better definition */
 }
 
 .textwarden-type-clarity {
-    background-color: rgba(58, 134, 255, 0.2);
-    color: #3a86ff;
+    background-color: rgba(58, 134, 255, 0.15);
+    color: #0047b3; /* Darker color for better contrast */
+    border: 1px solid rgba(58, 134, 255, 0.4); /* Add border for better definition */
 }
 
 .textwarden-type-general {
-    background-color: rgba(108, 117, 125, 0.2);
-    color: #6c757d;
+    background-color: rgba(108, 117, 125, 0.15);
+    color: #495057; /* Darker color for better contrast */
+    border: 1px solid rgba(108, 117, 125, 0.4); /* Add border for better definition */
 }
 
 /* Explanation tooltip */
@@ -175,29 +199,30 @@
     position: absolute;
     /* top and right are set dynamically in JS */
     width: 250px;
-    background-color: #343a40;
-    color: #f8f9fa;
-    padding: 10px 12px;
+    background-color: #ffffff; /* Lighter background for better contrast */
+    color: #333333; /* Darker text for better contrast */
+    padding: 12px 15px; /* Slightly larger padding */
     border-radius: 4px;
     font-size: 13px;
-    line-height: 1.5;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    line-height: 1.6; /* Increased line height for readability */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000000;
     display: none;
-    border-left: 3px solid #6c757d;
+    border: 1px solid #dddddd; /* Add border for better definition */
+    border-left: 3px solid #6c757d; /* Left border for type indication */
 }
 
 /* Add a small arrow to the tooltip */
 .textwarden-explanation-tooltip::before {
     content: "";
     position: absolute;
-    top: -5px;
+    top: -6px;
     right: 10px;
     width: 0;
     height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid #343a40;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #ffffff; /* Match the tooltip background */
 }
 
 /* Type-specific tooltip styling */
@@ -215,14 +240,6 @@
 
 .textwarden-type-clarity ~ .textwarden-explanation-tooltip {
     border-left-color: #3a86ff;
-}
-
-/* Issue text */
-.textwarden-issue-text {
-    color: #ff006e;
-    margin-bottom: 12px;
-    font-size: 13px;
-    font-style: italic;
 }
 
 /* Inline issue markers for contenteditable elements */

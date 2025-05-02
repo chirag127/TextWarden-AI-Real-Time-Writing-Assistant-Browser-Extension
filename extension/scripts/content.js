@@ -330,17 +330,62 @@ const createHighlightOverlay = (element, text, suggestions) => {
 
     // Show the popup automatically near the first issue
     if (suggestions && suggestions.length > 0) {
-        // Show the popup with a slight delay to ensure the highlighting is complete
-        setTimeout(() => {
-            // Calculate the optimal position for the popup
-            const position = calculatePopupPosition(element);
-            showSuggestionPopup(element, position.x, position.y, suggestions);
-        }, 100);
+        // Get the first issue marker to position the popup near it
+        const markers = wrapper.querySelectorAll(".textwarden-issue-marker");
+        let targetElement = element;
+
+        // If there are markers, use the first one as the target for positioning
+        if (markers.length > 0) {
+            // Use the first marker's position to better align with the issue
+            const firstMarker = markers[0];
+            const markerRect = firstMarker.getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+
+            // Create a temporary element for positioning
+            const tempTarget = document.createElement("div");
+            tempTarget.style.position = "absolute";
+            tempTarget.style.left = `${markerRect.left - wrapperRect.left}px`;
+            tempTarget.style.top = `${markerRect.top - wrapperRect.top}px`;
+            tempTarget.style.width = `${markerRect.width}px`;
+            tempTarget.style.height = `${markerRect.height}px`;
+            tempTarget.style.visibility = "hidden";
+            wrapper.appendChild(tempTarget);
+
+            // Use this temporary element for positioning
+            targetElement = tempTarget;
+
+            // Show the popup with a slight delay to ensure the highlighting is complete
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(targetElement);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+
+                // Remove the temporary element
+                wrapper.removeChild(tempTarget);
+            }, 100);
+        } else {
+            // If no markers, just use the element itself
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(element);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+            }, 100);
+        }
     }
 };
 
 // Highlight issues in contenteditable elements
-const highlightContentEditable = (element, text, suggestions) => {
+const highlightContentEditable = (element, _, suggestions) => {
     // We don't need the text parameter for contenteditable elements as we use innerHTML
     // Remove any existing highlights
     removeHighlights(element);
@@ -377,14 +422,41 @@ const highlightContentEditable = (element, text, suggestions) => {
     // Store the highlights for this element
     highlightedIssues.set(element, suggestions);
 
-    // Show the popup automatically near the element
+    // Show the popup automatically near the first issue
     if (suggestions && suggestions.length > 0) {
-        // Show the popup with a slight delay to ensure the highlighting is complete
-        setTimeout(() => {
-            // Calculate the optimal position for the popup
-            const position = calculatePopupPosition(element);
-            showSuggestionPopup(element, position.x, position.y, suggestions);
-        }, 100);
+        // Try to find the first issue marker
+        const markers = element.querySelectorAll(".textwarden-issue-marker");
+        let targetElement = element;
+
+        // If there are markers, use the first one as the target for positioning
+        if (markers.length > 0) {
+            // Use the first marker for positioning
+            targetElement = markers[0];
+
+            // Show the popup with a slight delay to ensure the highlighting is complete
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(targetElement);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+            }, 100);
+        } else {
+            // If no markers, just use the element itself
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(element);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+            }, 100);
+        }
     }
 };
 
@@ -511,39 +583,7 @@ const showSuggestionPopup = (element, x, y, suggestions) => {
     suggestionPopup.style.left = `${x}px`;
     suggestionPopup.style.top = `${y}px`;
 
-    // Ensure the popup is fully visible in the viewport
-    setTimeout(() => {
-        const popupRect = suggestionPopup.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-
-        // Check if popup goes beyond the right edge
-        if (popupRect.right > viewportWidth) {
-            suggestionPopup.style.left = `${Math.max(
-                0,
-                viewportWidth - popupRect.width - 10
-            )}px`;
-        }
-
-        // Check if popup goes beyond the bottom edge
-        if (popupRect.bottom > viewportHeight) {
-            // If there's not enough space below, position it above the element
-            if (y > viewportHeight / 2) {
-                // Element is in the bottom half of the screen, position popup above
-                suggestionPopup.style.top = `${Math.max(
-                    10,
-                    y - popupRect.height - 10
-                )}px`;
-            } else {
-                // Element is in the top half, just make sure popup doesn't go off-screen
-                suggestionPopup.style.top = `${Math.max(
-                    10,
-                    viewportHeight - popupRect.height - 10
-                )}px`;
-            }
-        }
-    }, 0);
-
+    // Display the popup
     suggestionPopup.style.display = "block";
 
     // Close popup when clicking outside
@@ -702,33 +742,20 @@ const calculatePopupPosition = (element) => {
     const rect = element.getBoundingClientRect();
 
     // Get the viewport dimensions
-    const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
 
     // Define the popup dimensions (approximate)
-    const popupHeight = 300; // Approximate height of the popup
     const popupWidth = 300; // Width of the popup
 
-    // Calculate available space below and above the element
-    const spaceBelow = viewportHeight - rect.bottom;
-    const spaceAbove = rect.top;
-
-    // Calculate x position (keep popup within viewport)
+    // Calculate x position (keep popup aligned with the input field)
     let x = rect.left;
     if (x + popupWidth > viewportWidth) {
         // If popup would go off the right edge, align it to the right edge of the element
         x = Math.max(0, rect.right - popupWidth);
     }
 
-    // Calculate y position
-    let y;
-    if (spaceBelow >= popupHeight || spaceBelow >= spaceAbove) {
-        // If there's enough space below or more space below than above, position below
-        y = rect.bottom + 5; // 5px below the element
-    } else {
-        // Otherwise, position above
-        y = Math.max(5, rect.top - popupHeight - 5); // 5px above the element, but not less than 5px from top
-    }
+    // Always position below the element
+    const y = rect.bottom + 5; // 5px below the element
 
     return { x, y };
 };
