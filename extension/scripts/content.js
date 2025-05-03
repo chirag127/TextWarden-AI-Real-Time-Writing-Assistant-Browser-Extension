@@ -20,9 +20,45 @@ let debounceTimer;
 let activeTextFields = new Map();
 let highlightedIssues = new Map();
 let suggestionPopup = null;
+let currentHostname = "";
+let isSiteDisabled = false;
+
+// Get current hostname
+const getCurrentHostname = () => {
+    try {
+        currentHostname = window.location.hostname;
+        return currentHostname;
+    } catch (error) {
+        console.error("TextWarden: Error getting hostname", error);
+        return "";
+    }
+};
+
+// Check if current site is in the disabled list
+const checkIfSiteDisabled = async () => {
+    try {
+        const hostname = getCurrentHostname();
+        if (!hostname) return false;
+
+        const { disabledSites = [] } = await chrome.storage.local.get(
+            "disabledSites"
+        );
+        return disabledSites.includes(hostname);
+    } catch (error) {
+        console.error("TextWarden: Error checking if site is disabled", error);
+        return false;
+    }
+};
 
 // Initialize the content script
 const initialize = async () => {
+    // Check if site is disabled
+    isSiteDisabled = await checkIfSiteDisabled();
+    if (isSiteDisabled) {
+        console.log(`TextWarden: Disabled for ${currentHostname}`);
+        return; // Don't initialize if site is disabled
+    }
+
     // Load settings from storage
     try {
         const settings = await chrome.storage.local.get([
@@ -49,7 +85,7 @@ const initialize = async () => {
     observeTextFields();
 
     // Listen for messages from background script
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
         if (message.action === "settingsUpdated") {
             // Update settings
             isEnabled = message.settings.enabled !== false;
@@ -60,7 +96,7 @@ const initialize = async () => {
 
             // Re-analyze active text fields with new settings
             if (isEnabled) {
-                activeTextFields.forEach((value, element) => {
+                activeTextFields.forEach((_value, element) => {
                     analyzeText(element, element.value || element.textContent);
                 });
             } else {
@@ -74,6 +110,24 @@ const initialize = async () => {
                 message.text,
                 message.suggestions
             );
+        } else if (message.action === "siteDisableStatusChanged") {
+            // Handle site disable status change
+            if (message.hostname === currentHostname) {
+                isSiteDisabled = message.isDisabled;
+
+                if (isSiteDisabled) {
+                    // Clean up if site was disabled
+                    removeAllHighlights();
+                    if (suggestionPopup) {
+                        suggestionPopup.style.display = "none";
+                    }
+                    // Clear active text fields
+                    activeTextFields.clear();
+                } else {
+                    // Re-initialize if site was enabled
+                    initialize();
+                }
+            }
         }
 
         // Always return true for async response
@@ -155,7 +209,7 @@ const attachTextFieldListeners = (element) => {
     // Generate a unique ID for this element if it doesn't have one
     if (!element.id) {
         element.id =
-            "textwarden-field-" + Math.random().toString(36).substr(2, 9);
+            "textwarden-field-" + Math.random().toString(36).substring(2, 11);
     }
 
     // Add to active text fields map
