@@ -268,30 +268,6 @@ const createHighlightOverlay = (element, text, suggestions) => {
         wrapper.style.display = "inline-block";
         wrapper.style.position = "relative";
 
-        // Copy relevant styles from the element to ensure proper positioning
-        const stylesToCopy = [
-            "margin",
-            "marginTop",
-            "marginRight",
-            "marginBottom",
-            "marginLeft",
-            "padding",
-            "paddingTop",
-            "paddingRight",
-            "paddingBottom",
-            "paddingLeft",
-            "border",
-            "borderWidth",
-            "borderStyle",
-            "borderColor",
-            "borderRadius",
-            "boxSizing",
-        ];
-
-        stylesToCopy.forEach((style) => {
-            wrapper.style[style] = elementStyle[style];
-        });
-
         // Insert the wrapper in the DOM
         element.parentNode.insertBefore(wrapper, element);
         wrapper.appendChild(element);
@@ -300,85 +276,53 @@ const createHighlightOverlay = (element, text, suggestions) => {
     // Get the element's text content
     const elementText = text;
 
-    // Create a canvas for more accurate text measurements
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const elementStyle = window.getComputedStyle(element);
-    ctx.font = elementStyle.font;
-
-    // Get element dimensions for line wrapping calculations
-    const elementWidth =
-        element.clientWidth -
-        (parseFloat(elementStyle.paddingLeft) +
-            parseFloat(elementStyle.paddingRight));
-
     // Create markers for each issue
     suggestions.forEach((suggestion, index) => {
         const issueText = suggestion.issue;
         if (!issueText) return;
 
-        // Find all occurrences of the issue text in the element's text
-        const issueIndices = findAllOccurrences(elementText, issueText);
-        if (issueIndices.length === 0) return;
+        // Find the position of the issue text in the element's text
+        const issueIndex = elementText.indexOf(issueText);
+        if (issueIndex === -1) return;
 
-        // Create a marker for each occurrence of this issue
-        issueIndices.forEach((issueIndex) => {
-            // Create a marker for this issue
-            const marker = document.createElement("div");
-            marker.className = `textwarden-issue-marker ${
-                suggestion.type || "general"
-            }`;
-            marker.setAttribute("data-issue-index", index);
-            marker.setAttribute("data-issue-text", issueText);
-            marker.setAttribute("data-suggestion", suggestion.suggestion || "");
+        // Create a marker for this issue
+        const marker = document.createElement("div");
+        marker.className = `textwarden-issue-marker ${
+            suggestion.type || "general"
+        }`;
+        marker.setAttribute("data-issue-index", index);
 
-            // Calculate position based on text wrapping and line breaks
-            const { left, top, width, height, lineCount } =
-                calculateTextPosition(
-                    element,
-                    elementText,
-                    issueIndex,
-                    issueText.length,
-                    ctx,
-                    elementWidth
-                );
+        // Position the marker over the issue text
+        // This is a simplified approach - in a real extension, you would need more sophisticated positioning
+        const textBeforeIssue = elementText.substring(0, issueIndex);
 
-            // Set the marker's position and dimensions
-            marker.style.left = `${left}px`;
-            marker.style.top = `${top}px`;
-            marker.style.width = `${width}px`;
-            marker.style.height = `${height}px`;
+        // Create a temporary span to measure text width
+        const measureSpan = document.createElement("span");
+        measureSpan.style.visibility = "hidden";
+        measureSpan.style.position = "absolute";
+        measureSpan.style.whiteSpace = "pre";
+        measureSpan.style.font = window.getComputedStyle(element).font;
+        document.body.appendChild(measureSpan);
 
-            // For multi-line issues, use a different style
-            if (lineCount > 1) {
-                marker.classList.add("textwarden-multiline-issue");
-            }
+        // Measure the width of the text before the issue
+        measureSpan.textContent = textBeforeIssue;
+        const offsetLeft = measureSpan.offsetWidth;
 
-            // Add the marker to the wrapper
-            wrapper.appendChild(marker);
+        // Measure the width of the issue text
+        measureSpan.textContent = issueText;
+        const issueWidth = measureSpan.offsetWidth;
 
-            // Add click event to the marker to show popup
-            marker.addEventListener("click", (event) => {
-                event.stopPropagation();
+        // Clean up
+        document.body.removeChild(measureSpan);
 
-                // Find all suggestions for this issue text
-                const relevantSuggestions = suggestions.filter(
-                    (s) => s.issue === issueText
-                );
+        // Set the marker's position and dimensions
+        marker.style.left = `${offsetLeft}px`;
+        marker.style.bottom = "0";
+        marker.style.width = `${issueWidth}px`;
+        marker.style.height = "2px";
 
-                // Calculate position for the popup
-                const markerRect = marker.getBoundingClientRect();
-                const position = calculatePopupPosition(marker, markerRect);
-
-                // Show the popup
-                showSuggestionPopup(
-                    element,
-                    position.x,
-                    position.y,
-                    relevantSuggestions
-                );
-            });
-        });
+        // Add the marker to the wrapper
+        wrapper.appendChild(marker);
     });
 
     // Store the highlights for this element
@@ -388,25 +332,44 @@ const createHighlightOverlay = (element, text, suggestions) => {
     if (suggestions && suggestions.length > 0) {
         // Get the first issue marker to position the popup near it
         const markers = wrapper.querySelectorAll(".textwarden-issue-marker");
+        let targetElement = element;
 
         // If there are markers, use the first one as the target for positioning
         if (markers.length > 0) {
             // Use the first marker's position to better align with the issue
             const firstMarker = markers[0];
             const markerRect = firstMarker.getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
 
-            // Calculate position for the popup
-            const position = calculatePopupPosition(firstMarker, markerRect);
+            // Create a temporary element for positioning
+            const tempTarget = document.createElement("div");
+            tempTarget.style.position = "absolute";
+            tempTarget.style.left = `${markerRect.left - wrapperRect.left}px`;
+            // Position at the bottom of the marker for closer popup placement
+            tempTarget.style.top = `${
+                markerRect.top + markerRect.height - wrapperRect.top
+            }px`;
+            tempTarget.style.width = `${markerRect.width}px`;
+            tempTarget.style.height = `0px`; // Zero height to position exactly at the bottom
+            tempTarget.style.visibility = "hidden";
+            wrapper.appendChild(tempTarget);
+
+            // Use this temporary element for positioning
+            targetElement = tempTarget;
 
             // Show the popup with a slight delay to ensure the highlighting is complete
             setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(targetElement);
                 showSuggestionPopup(
                     element,
                     position.x,
                     position.y,
-                    suggestions,
-                    position.position
+                    suggestions
                 );
+
+                // Remove the temporary element
+                wrapper.removeChild(tempTarget);
             }, 100);
         } else {
             // If no markers, just use the element itself
@@ -417,32 +380,16 @@ const createHighlightOverlay = (element, text, suggestions) => {
                     element,
                     position.x,
                     position.y,
-                    suggestions,
-                    position.position
+                    suggestions
                 );
             }, 100);
         }
     }
-
-    // Add resize event listener to reposition markers when window is resized
-    const resizeHandler = debounce(() => {
-        // Remove existing markers
-        const existingMarkers = wrapper.querySelectorAll(
-            ".textwarden-issue-marker"
-        );
-        existingMarkers.forEach((marker) => marker.remove());
-
-        // Re-create markers with updated positions
-        createHighlightOverlay(element, text, suggestions);
-    }, 250);
-
-    // Store the resize handler in a data attribute for cleanup
-    wrapper.setAttribute("data-resize-handler-id", Date.now().toString());
-    window.addEventListener("resize", resizeHandler);
 };
 
 // Highlight issues in contenteditable elements
 const highlightContentEditable = (element, _, suggestions) => {
+    // We don't need the text parameter for contenteditable elements as we use innerHTML
     // Remove any existing highlights
     removeHighlights(element);
 
@@ -450,7 +397,7 @@ const highlightContentEditable = (element, _, suggestions) => {
     let html = element.innerHTML;
 
     // Process each suggestion
-    suggestions.forEach((suggestion, index) => {
+    suggestions.forEach((suggestion) => {
         const issueText = suggestion.issue;
         if (!issueText) return;
 
@@ -468,13 +415,7 @@ const highlightContentEditable = (element, _, suggestions) => {
             regex,
             `<span class="textwarden-issue-marker ${
                 suggestion.type || "general"
-            }" data-issue-index="${index}" data-issue-text="${issueText.replace(
-                /"/g,
-                "&quot;"
-            )}" data-suggestion="${(suggestion.suggestion || "").replace(
-                /"/g,
-                "&quot;"
-            )}">${issueText}</span>`
+            }">${issueText}</span>`
         );
     });
 
@@ -484,78 +425,68 @@ const highlightContentEditable = (element, _, suggestions) => {
     // Store the highlights for this element
     highlightedIssues.set(element, suggestions);
 
-    // Add click event listeners to all issue markers
-    const markers = element.querySelectorAll(".textwarden-issue-marker");
-    markers.forEach((marker) => {
-        marker.addEventListener("click", (event) => {
-            event.stopPropagation();
-
-            // Get the issue text from the marker
-            const issueText = marker.getAttribute("data-issue-text");
-
-            // Find all suggestions for this issue text
-            const relevantSuggestions = suggestions.filter(
-                (s) => s.issue === issueText
-            );
-
-            if (relevantSuggestions.length === 0) return;
-
-            // Calculate position for the popup
-            const markerRect = marker.getBoundingClientRect();
-            const position = calculatePopupPosition(marker, markerRect);
-
-            // Show the popup
-            showSuggestionPopup(
-                element,
-                position.x,
-                position.y,
-                relevantSuggestions,
-                position.position
-            );
-        });
-    });
-
     // Show the popup automatically near the first issue
-    if (suggestions && suggestions.length > 0 && markers.length > 0) {
-        // Get the first marker's position
-        const firstMarker = markers[0];
-        const markerRect = firstMarker.getBoundingClientRect();
+    if (suggestions && suggestions.length > 0) {
+        // Try to find the first issue marker
+        const markers = element.querySelectorAll(".textwarden-issue-marker");
+        let targetElement = element;
 
-        // Calculate position for the popup
-        const position = calculatePopupPosition(firstMarker, markerRect);
+        // If there are markers, use the first one as the target for positioning
+        if (markers.length > 0) {
+            // Get the marker's position
+            const markerRect = markers[0].getBoundingClientRect();
 
-        // Show the popup with a slight delay to ensure the highlighting is complete
-        setTimeout(() => {
-            showSuggestionPopup(
-                element,
-                position.x,
-                position.y,
-                suggestions,
-                position.position
-            );
-        }, 100);
+            // Create a temporary element for precise positioning
+            const tempTarget = document.createElement("div");
+            tempTarget.style.position = "absolute";
+            tempTarget.style.left = `${markerRect.left}px`;
+            tempTarget.style.top = `${markerRect.bottom}px`; // Position at the bottom of the marker
+            tempTarget.style.width = `${markerRect.width}px`;
+            tempTarget.style.height = "0px"; // Zero height for exact positioning
+            tempTarget.style.visibility = "hidden";
+            document.body.appendChild(tempTarget);
+
+            // Use this temporary element for positioning
+            targetElement = tempTarget;
+
+            // Set up cleanup after positioning
+            setTimeout(() => {
+                document.body.removeChild(tempTarget);
+            }, 200);
+
+            // Show the popup with a slight delay to ensure the highlighting is complete
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(targetElement);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+            }, 100);
+        } else {
+            // If no markers, just use the element itself
+            setTimeout(() => {
+                // Calculate the optimal position for the popup
+                const position = calculatePopupPosition(element);
+                showSuggestionPopup(
+                    element,
+                    position.x,
+                    position.y,
+                    suggestions
+                );
+            }, 100);
+        }
     }
 };
 
 // Show suggestion popup
-const showSuggestionPopup = (element, x, y, suggestions, position = null) => {
+const showSuggestionPopup = (element, x, y, suggestions) => {
     if (!suggestionPopup) return;
 
     // Clear previous content
     suggestionPopup.innerHTML = "";
-
-    // Remove any existing position classes
-    suggestionPopup.classList.remove(
-        "textwarden-popup-above-right",
-        "textwarden-popup-above-left",
-        "textwarden-popup-below-right",
-        "textwarden-popup-below-left"
-    );
-
-    // Add position class if provided
-    if (position) {
-        suggestionPopup.classList.add(`textwarden-popup-${position}`);
-    }
 
     // Create content container (we'll skip the header to improve scrolling)
     const contentContainer = document.createElement("div");
@@ -707,36 +638,6 @@ const showSuggestionPopup = (element, x, y, suggestions, position = null) => {
     // Display the popup
     suggestionPopup.style.display = "block";
 
-    // Add scroll event listener to reposition popup when page is scrolled
-    const scrollHandler = debounce(() => {
-        // Recalculate position
-        const newPosition = calculatePopupPosition(element);
-
-        // Update popup position
-        suggestionPopup.style.left = `${newPosition.x}px`;
-        suggestionPopup.style.top = `${newPosition.y}px`;
-
-        // Update position class
-        suggestionPopup.classList.remove(
-            "textwarden-popup-above-right",
-            "textwarden-popup-above-left",
-            "textwarden-popup-below-right",
-            "textwarden-popup-below-left"
-        );
-        suggestionPopup.classList.add(
-            `textwarden-popup-${newPosition.position}`
-        );
-    }, 100);
-
-    // Add scroll event listener
-    window.addEventListener("scroll", scrollHandler);
-
-    // Store the scroll handler for cleanup
-    suggestionPopup.setAttribute(
-        "data-scroll-handler-id",
-        Date.now().toString()
-    );
-
     // Close popup when clicking outside
     const closePopupHandler = (event) => {
         if (
@@ -745,7 +646,6 @@ const showSuggestionPopup = (element, x, y, suggestions, position = null) => {
         ) {
             suggestionPopup.style.display = "none";
             document.removeEventListener("click", closePopupHandler);
-            window.removeEventListener("scroll", scrollHandler);
         }
     };
 
@@ -883,13 +783,6 @@ const removeHighlights = (element) => {
     // For input/textarea elements with a wrapper
     const wrapper = element.parentElement;
     if (wrapper && wrapper.classList.contains("textwarden-highlight-wrapper")) {
-        // Remove resize event listener if it exists
-        const resizeHandlerId = wrapper.getAttribute("data-resize-handler-id");
-        if (resizeHandlerId) {
-            window.removeEventListener("resize", resizeHandlerId);
-            wrapper.removeAttribute("data-resize-handler-id");
-        }
-
         // Remove all issue markers
         const markers = wrapper.querySelectorAll(".textwarden-issue-marker");
         markers.forEach((marker) => marker.remove());
@@ -902,27 +795,12 @@ const removeHighlights = (element) => {
 
         // Remove all issue marker spans
         html = html.replace(
-            /<span class="textwarden-issue-marker [^"]*"[^>]*>(.*?)<\/span>/g,
+            /<span class="textwarden-issue-marker [^"]*">(.*?)<\/span>/g,
             "$1"
         );
 
         // Update the element's HTML
         element.innerHTML = html;
-    }
-
-    // Hide popup if it's visible
-    if (suggestionPopup && suggestionPopup.style.display === "block") {
-        // Remove scroll event listener if it exists
-        const scrollHandlerId = suggestionPopup.getAttribute(
-            "data-scroll-handler-id"
-        );
-        if (scrollHandlerId) {
-            window.removeEventListener("scroll", scrollHandlerId);
-            suggestionPopup.removeAttribute("data-scroll-handler-id");
-        }
-
-        // Hide the popup
-        suggestionPopup.style.display = "none";
     }
 
     // Remove from highlighted issues map
@@ -931,19 +809,6 @@ const removeHighlights = (element) => {
 
 // Remove all highlights
 const removeAllHighlights = () => {
-    // Remove resize event listeners from wrappers
-    document
-        .querySelectorAll(".textwarden-highlight-wrapper")
-        .forEach((wrapper) => {
-            const resizeHandlerId = wrapper.getAttribute(
-                "data-resize-handler-id"
-            );
-            if (resizeHandlerId) {
-                window.removeEventListener("resize", resizeHandlerId);
-                wrapper.removeAttribute("data-resize-handler-id");
-            }
-        });
-
     // Remove all issue markers from wrappers
     document.querySelectorAll(".textwarden-issue-marker").forEach((marker) => {
         marker.remove();
@@ -953,7 +818,7 @@ const removeAllHighlights = () => {
     document.querySelectorAll("[contenteditable='true']").forEach((element) => {
         let html = element.innerHTML;
         html = html.replace(
-            /<span class="textwarden-issue-marker [^"]*"[^>]*>(.*?)<\/span>/g,
+            /<span class="textwarden-issue-marker [^"]*">(.*?)<\/span>/g,
             "$1"
         );
         element.innerHTML = html;
@@ -962,16 +827,8 @@ const removeAllHighlights = () => {
     // Clear highlighted issues map
     highlightedIssues.clear();
 
-    // Hide suggestion popup and remove scroll event listener
+    // Hide suggestion popup
     if (suggestionPopup) {
-        const scrollHandlerId = suggestionPopup.getAttribute(
-            "data-scroll-handler-id"
-        );
-        if (scrollHandlerId) {
-            window.removeEventListener("scroll", scrollHandlerId);
-            suggestionPopup.removeAttribute("data-scroll-handler-id");
-        }
-
         suggestionPopup.style.display = "none";
     }
 };
@@ -992,178 +849,36 @@ const updateCorrectionCount = () => {
     });
 };
 
-// Helper function to find all occurrences of a substring in a string
-const findAllOccurrences = (text, subtext) => {
-    const indices = [];
-    let index = 0;
-    while ((index = text.indexOf(subtext, index)) !== -1) {
-        indices.push(index);
-        index += 1; // Move past the current match to find the next one
-    }
-    return indices;
-};
-
-// Helper function to create a debounced function
-const debounce = (func, delay) => {
-    let timeoutId;
-    return function (...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-};
-
-// Calculate text position considering line breaks and wrapping
-const calculateTextPosition = (
-    element,
-    fullText,
-    startIndex,
-    length,
-    ctx,
-    maxWidth
-) => {
-    // Get element's padding
-    const style = window.getComputedStyle(element);
-    const paddingLeft = parseFloat(style.paddingLeft);
-    const paddingTop = parseFloat(style.paddingTop);
-    const lineHeight =
-        parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.2;
-
-    // Text before the issue
-    const textBefore = fullText.substring(0, startIndex);
-
-    // The issue text
-    const issueText = fullText.substring(startIndex, startIndex + length);
-
-    // Split text by line breaks
-    const linesBefore = textBefore.split("\n");
-    const lastLineBeforeIssue = linesBefore[linesBefore.length - 1];
-
-    // Check if issue text contains line breaks
-    const issueLines = issueText.split("\n");
-    const lineCount = issueLines.length;
-
-    // Calculate line wrapping for the last line before the issue
-    let currentLineWidth = 0;
-    let currentLine = "";
-    let lineNumber = linesBefore.length - 1;
-    let lineStartIndex = textBefore.lastIndexOf("\n") + 1;
-
-    // Process each word in the last line before the issue to calculate wrapping
-    const words = lastLineBeforeIssue.split(" ");
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        const wordWidth = ctx.measureText(word + " ").width;
-
-        if (currentLineWidth + wordWidth <= maxWidth) {
-            currentLine += word + " ";
-            currentLineWidth += wordWidth;
-        } else {
-            // Word wraps to next line
-            currentLine = word + " ";
-            currentLineWidth = wordWidth;
-            lineNumber++;
-            lineStartIndex = textBefore.indexOf(word, lineStartIndex);
-        }
-    }
-
-    // Calculate the left position (horizontal offset)
-    const left = ctx.measureText(currentLine).width + paddingLeft;
-
-    // Calculate the top position (vertical offset)
-    const top = lineNumber * lineHeight + paddingTop;
-
-    // Calculate width and height for the issue text
-    let width, height;
-
-    if (lineCount === 1) {
-        // Single line issue
-        width = ctx.measureText(issueText).width;
-        height = 2; // Underline height
-    } else {
-        // Multi-line issue
-        // For simplicity, we'll use the width of the first line
-        // and set the height to cover all lines
-        width = ctx.measureText(issueLines[0]).width;
-        height = lineCount * lineHeight;
-    }
-
-    return { left, top, width, height, lineCount };
-};
-
 // Calculate the optimal position for the popup
-const calculatePopupPosition = (element, rect = null) => {
+const calculatePopupPosition = (element) => {
     // Get the element's position
-    const elementRect = rect || element.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
 
     // Get the viewport dimensions
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Get scroll position
-    const scrollX = window.scrollX || window.pageXOffset;
-    const scrollY = window.scrollY || window.pageYOffset;
-
     // Define the popup dimensions (approximate)
     const popupWidth = 300; // Width of the popup
-    const popupHeight = 250; // Approximate height of the popup
+    const popupHeight = 200; // Approximate height of the popup
 
-    // Calculate the available space in different directions
-    const spaceAbove = elementRect.top;
-    const spaceBelow = viewportHeight - elementRect.bottom;
-    const spaceLeft = elementRect.left;
-    const spaceRight = viewportWidth - elementRect.right;
-
-    // Determine the best position based on available space
-    let position = "below"; // Default position
-
-    if (spaceBelow < popupHeight && spaceAbove > spaceBelow) {
-        position = "above";
+    // Calculate x position (keep popup aligned with the input field)
+    let x = rect.left;
+    if (x + popupWidth > viewportWidth) {
+        // If popup would go off the right edge, align it to the right edge of the element
+        x = Math.max(0, rect.right - popupWidth);
     }
 
-    if (spaceRight < popupWidth && spaceLeft > spaceRight) {
-        position = position === "above" ? "above-left" : "below-left";
-    } else {
-        position = position === "above" ? "above-right" : "below-right";
+    // Calculate y position
+    let y = rect.bottom + 5; // Position below the element with a small gap
+
+    // Check if the popup would go off the bottom of the viewport
+    if (y + popupHeight > viewportHeight) {
+        // Position above the element instead
+        y = Math.max(0, rect.top - popupHeight - 5);
     }
 
-    // Calculate coordinates based on the determined position
-    let x, y;
-
-    switch (position) {
-        case "below-right":
-            x = elementRect.left + scrollX;
-            y = elementRect.bottom + scrollY + 5;
-            break;
-        case "below-left":
-            x = elementRect.right - popupWidth + scrollX;
-            y = elementRect.bottom + scrollY + 5;
-            break;
-        case "above-right":
-            x = elementRect.left + scrollX;
-            y = elementRect.top + scrollY - popupHeight - 5;
-            break;
-        case "above-left":
-            x = elementRect.right - popupWidth + scrollX;
-            y = elementRect.top + scrollY - popupHeight - 5;
-            break;
-        default:
-            x = elementRect.left + scrollX;
-            y = elementRect.bottom + scrollY + 5;
-    }
-
-    // Ensure the popup stays within the viewport
-    x = Math.max(
-        scrollX + 5,
-        Math.min(x, scrollX + viewportWidth - popupWidth - 5)
-    );
-    y = Math.max(
-        scrollY + 5,
-        Math.min(y, scrollY + viewportHeight - popupHeight - 5)
-    );
-
-    return { x, y, position };
+    return { x, y };
 };
 
 // Initialize the content script
