@@ -1,0 +1,179 @@
+/* TextWarden Content Styles */
+
+/* Highlight styles */
+.textwarden-highlight {
+  background-color: transparent;
+  border-bottom: 2px solid #e53935;
+  cursor: pointer;
+  position: relative;
+}
+
+.textwarden-grammar {
+  border-bottom-color: #e53935;
+}
+
+.textwarden-spelling {
+  border-bottom-color: #fb8c00;
+}
+
+.textwarden-style {
+  border-bottom-color: #7986cb;
+}
+
+.textwarden-clarity {
+  border-bottom-color: #43a047;
+}
+
+/* Popup styles */
+.textwarden-popup {
+  position: absolute;
+  z-index: 9999;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  max-width: 300px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  animation: textwarden-fadein 0.2s;
+}
+
+@keyframes textwarden-fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.textwarden-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.textwarden-popup-title {
+  font-weight: 600;
+  color: #4a6fa5;
+  margin: 0;
+}
+
+.textwarden-popup-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.textwarden-popup-close:hover {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.textwarden-issue {
+  margin-bottom: 8px;
+}
+
+.textwarden-issue-text {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.textwarden-issue-explanation {
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.textwarden-suggestions {
+  margin-bottom: 8px;
+}
+
+.textwarden-suggestion {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: #f5f7fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.textwarden-suggestion:hover {
+  background-color: #e8f0fe;
+  border-color: #4a6fa5;
+}
+
+.textwarden-apply-all {
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.textwarden-apply-all:hover {
+  background-color: #3a5a80;
+}
+
+/* Message styles */
+.textwarden-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  z-index: 10000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  animation: textwarden-message-fadein 0.3s;
+}
+
+@keyframes textwarden-message-fadein {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.textwarden-message.success {
+  background-color: #e8f5e9;
+  border-left: 4px solid #43a047;
+  color: #2e7d32;
+}
+
+.textwarden-message.error {
+  background-color: #ffebee;
+  border-left: 4px solid #e53935;
+  color: #c62828;
+}
+
+.textwarden-message.info {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  color: #1565c0;
+}
+
+/* Wrapper for input fields */
+.textwarden-wrapper {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  overflow: hidden;
+}

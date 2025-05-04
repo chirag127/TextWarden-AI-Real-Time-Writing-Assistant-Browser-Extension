@@ -34,14 +34,12 @@ async function getGeminiSuggestion(
 
     try {
         // Initialize dynamically with the user's key for THIS request
-        // Initialize Google GenAI with the provided API key
-        const ai = new GoogleGenAI({ apiKey: userApiKey });
+        const ai = new GoogleGenAI({
+            apiKey: userApiKey,
+        });
 
         // Configure the request
         const config = {
-            thinkingConfig: {
-                thinkingBudget: 0,
-            },
             responseMimeType: "text/plain",
         };
 
@@ -54,28 +52,34 @@ async function getGeminiSuggestion(
         const promptText = `
 You are TextWarden, an AI writing assistant that analyzes text for issues and provides suggestions for improvement.
 
-Analyze the following text for ${checkTypesText} issues. For each issue you find, provide:
-1. The problematic text
-2. The type of issue (grammar, spelling, style, or clarity)
-3. A brief explanation of the issue
-4. A suggested correction
+Analyze the following text for ${checkTypesText} issues and provide suggestions for improvement.
 
-IMPORTANT: Your response must be ONLY a valid JSON array of objects with the following structure:
+For each issue you find, return a JSON object with the following properties:
+- type: The type of issue (grammar, spelling, style, clarity)
+- text: The text containing the issue
+- explanation: A brief explanation of the issue
+- replacements: An array of suggested replacements
+- position: An object with start and end indices of the issue in the original text
+
+Return your response as a JSON array of these objects. For example:
 [
   {
-    "issue": "problematic text",
-    "type": "issue type (grammar, spelling, style, or clarity)",
-    "explanation": "brief explanation of the issue",
-    "suggestion": "suggested correction"
-  },
-  ...
+    "type": "grammar",
+    "text": "They was happy",
+    "explanation": "Subject-verb agreement error. 'They' requires the plural verb 'were'.",
+    "replacements": ["They were happy"],
+    "position": {
+      "start": 0,
+      "end": 13
+    }
+  }
 ]
 
 If you find no issues, return an empty array: []
 
 Do not include any explanations, markdown formatting, or code block markers (like \`\`\`json or \`\`\`).
 Your entire response must be a valid JSON array that can be parsed directly with JSON.parse().
-if the issue text appears multiple times then make the issue text bigger until it is unique. 
+If the issue text appears multiple times then make the issue text bigger until it is unique.
 
 TEXT TO ANALYZE:
 """
@@ -91,15 +95,18 @@ RESPONSE (ONLY the JSON array):`;
             },
         ];
 
-        // Adjust based on whether streaming or single response is needed per feature
-        const response = await ai.models.generateContent({
+        // Use streaming to get the response
+        let responseText = "";
+        const response = await ai.models.generateContentStream({
             model,
-            contents,
             config,
+            contents,
         });
 
-        // Get the response text
-        const responseText = response.text;
+        for await (const chunk of response) {
+            responseText += chunk.text;
+        }
+
         console.log("Raw response from Gemini API:", responseText);
 
         // Parse the JSON response

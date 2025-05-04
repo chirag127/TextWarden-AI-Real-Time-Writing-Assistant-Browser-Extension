@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextWarden Test Page</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: #4a6fa5;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    h2 {
+      color: #4a6fa5;
+      margin-top: 30px;
+    }
+    
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #f5f7fa;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .editable-div {
+      min-height: 100px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      background-color: white;
+    }
+    
+    .test-text {
+      color: #666;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+    
+    button {
+      background-color: #4a6fa5;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background-color: #3a5a80;
+    }
+  </style>
+</head>
+<body>
+  <h1>TextWarden Test Page</h1>
+  <p>This page contains various text fields to test the TextWarden extension. Type or paste text with grammar, spelling, style, or clarity issues to see how the extension highlights and suggests improvements.</p>
+  
+  <div class="test-section">
+    <h2>Input Field Test</h2>
+    <label for="inputTest">Type or paste text here:</label>
+    <input type="text" id="inputTest" placeholder="Try typing 'They was happy' or 'Your the best'">
+    <div class="test-text">Example issues: "They was happy" (grammar), "Your the best" (spelling/grammar)</div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Textarea Test</h2>
+    <label for="textareaTest">Type or paste text here:</label>
+    <textarea id="textareaTest" rows="5" placeholder="Try typing text with grammar, spelling, style, or clarity issues"></textarea>
+    <div class="test-text">Example text with issues: "The company have announced a new policy. It effect all employees. Your going to need to adapt quick."</div>
+    <button id="fillTextarea">Fill with Sample Text</button>
+  </div>
+  
+  <div class="test-section">
+    <h2>Contenteditable Test</h2>
+    <label for="editableTest">Type or paste text here:</label>
+    <div id="editableTest" class="editable-div" contenteditable="true"></div>
+    <div class="test-text">Example text with issues: "She dont know nothing about the situation. The data is showing a increase in sales."</div>
+    <button id="fillEditable">Fill with Sample Text</button>
+  </div>
+  
+  <div class="test-section">
+    <h2>Email Field Test</h2>
+    <label for="emailTest">Type an email message:</label>
+    <textarea id="emailTest" rows="5" placeholder="Try typing an email message with issues"></textarea>
+    <div class="test-text">Example email with issues: "Dear Sir, I am writing to inquire about you're product. I seen it advertised and would like more informations."</div>
+    <button id="fillEmail">Fill with Sample Email</button>
+  </div>
+  
+  <script>
+    // Sample texts for testing
+    const sampleTexts = {
+      textarea: "The company have announced a new policy. It effect all employees. Your going to need to adapt quick. We must insure that everyone understand the changes. This will definately improve our productivity.",
+      editable: "She dont know nothing about the situation. The data is showing a increase in sales. However, we should'nt make assumptions to quick. Its important to analyze the results careful.",
+      email: "Dear Sir,\n\nI am writing to inquire about you're product. I seen it advertised and would like more informations. Could you please advice me on the price and availability?\n\nI look forward to here from you soon.\n\nYour's sincerely,\nJohn Smith"
+    };
+    
+    // Fill buttons
+    document.getElementById('fillTextarea').addEventListener('click', () => {
+      document.getElementById('textareaTest').value = sampleTexts.textarea;
+    });
+    
+    document.getElementById('fillEditable').addEventListener('click', () => {
+      document.getElementById('editableTest').innerHTML = sampleTexts.editable.replace(/\n/g, '<br>');
+    });
+    
+    document.getElementById('fillEmail').addEventListener('click', () => {
+      document.getElementById('emailTest').value = sampleTexts.email;
+    });
+  </script>
+</body>
+</html>
