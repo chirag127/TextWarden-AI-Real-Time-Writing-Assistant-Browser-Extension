@@ -1,64 +1,52 @@
-# 🔒 Security Policy for TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension
+# Security Policy
 
-This document outlines the security model, vulnerability reporting procedures, and best practices for maintaining the integrity and privacy of the TextWarden extension.
+## Supported Versions
 
-## 1. Security Commitment: Privacy-First Architecture
+We are committed to maintaining a secure product. Currently, only the latest version of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension is actively maintained and supported with security patches.
 
-TextWarden is designed with a **Zero Trust** approach, particularly concerning user input and interaction with the Google Gemini API. Our core commitment is that user data processed by the extension remains local or is handled via the most secure, non-logging endpoints available, adhering strictly to the security posture required by Manifest V3.
+## Reporting a Vulnerability
 
-### Architectural Security Principles Enforced:
+We take security very seriously. If you discover any security vulnerabilities within TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension, please report it to us immediately. We appreciate your help in keeping our community safe.
 
-1.  **Input Sanitization:** All data transmitted to the Gemini API is aggressively validated and sanitized on the client-side and server-side (if a proxy exists) to prevent injection attacks (XSS, prompt injection). **(OWASP Top 10 2025 Focus)**.
-2.  **Key Management:** API keys are never hardcoded. They are managed via secure environment variables during the build process and are **never** shipped to the client bundle.
-3.  **Manifest V3 Compliance:** Strict adherence to MV3 rules regarding background service workers, network requests, and content script isolation.
-4.  **Data Minimization:** Only textual content required for linguistic analysis is sent; no PII or historical navigation data is collected or transmitted unless explicitly consented to for feature improvement.
+To report a vulnerability, please:
 
-## 2. Supported Versions
+1.  **Do NOT** disclose the vulnerability publicly until it has been resolved.
+2.  **DO** use the secure reporting channel:
+    *   **Email:** [security@example.com](mailto:security@example.com) (Please replace with a real security contact email).
+    *   **Subject:** `Security Vulnerability Report: [Project Name]`
+    *   **Content:** Provide a clear and concise description of the vulnerability, including:
+        *   The affected version(s).
+        *   Detailed steps to reproduce the vulnerability.
+        *   Any supporting evidence (screenshots, logs, code snippets).
+        *   Your recommended mitigation or fix (if known).
 
-| Version Range | Status | Security Updates | Reporting Path |
-| :--- | :--- | :--- | :--- |
-| `v2.x.x` (Current) | Maintained | Weekly | Immediate |
-| `v1.x.x` | Legacy | None | Upgrade Recommended |
+We will acknowledge receipt of your report within **48 hours** and will provide an estimated timeline for resolution.
 
-## 3. Vulnerability Reporting
+## Vulnerability Disclosure Policy
 
-We value external security researchers. If you discover a security vulnerability, please follow the process below to ensure responsible disclosure.
+Once a vulnerability is reported and confirmed, we will work diligently to address it. We will follow these principles:
 
-### 3.1. Responsible Disclosure Process
+*   **Triaging:** We will assess the severity and impact of the reported vulnerability.
+*   **Remediation:** We will develop and test a fix.
+*   **Disclosure:** We will work with the reporter to determine a coordinated public disclosure timeline, typically after a fix is available. This allows users to update and protect themselves.
+*   **Acknowledgement:** We will acknowledge the contributions of security researchers who report valid vulnerabilities in good faith.
 
-**DO NOT** disclose vulnerabilities publicly (e.g., GitHub Issues, public forums) before coordinating with the maintainers.
+## Security Best Practices
 
-1.  **Report:** Create a **private security report** via GitHub's private vulnerability reporting feature. This ensures that only core maintainers have access to the details.
-2.  **Details:** Provide sufficient detail for reproduction, including:
-    *   The affected version(s).
-    *   Steps to reproduce the vulnerability.
-    *   The potential impact.
-3.  **Acknowledgement:** We will acknowledge receipt of your report within **48 hours**.
-4.  **Remediation:** We aim to deploy a fix for critical and high-severity issues within **14 days** of confirmation. We will coordinate with you before public disclosure.
-5.  **Public Disclosure:** Public disclosure will occur after a patch has been released and sufficient time has passed for users to update.
+As a user of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension, please adhere to the following security best practices:
 
-### 3.2. Severity Classification
+*   **Install Updates Promptly:** Always keep the extension updated to the latest version to benefit from the most recent security patches.
+*   **Review Permissions:** Be mindful of the permissions requested by browser extensions. While TextWarden is designed with privacy and security as top priorities, always be aware of what an extension can access.
+*   **API Key Security:** If you are developing custom integrations or using TextWarden in a specific enterprise context requiring API keys (e.g., Google Gemini API), ensure these keys are stored securely and are not exposed in client-side code or public repositories.
+*   **Browser Security:** Maintain good general browser security hygiene, including using strong, unique passwords, enabling two-factor authentication where possible, and being cautious of phishing attempts.
 
-We classify issues based on potential impact on user data confidentiality, integrity, and extension availability:
+## DevSecOps Protocol Adherence
 
-*   **Critical:** Remote Code Execution in Service Worker, Complete API Key Leakage, Massive Data Exfiltration.
-*   **High:** Prompt Injection leading to unauthorized API calls, CSP bypass, Persistent Cross-Site Scripting (XSS).
-*   **Medium:** Information disclosure of non-sensitive runtime data, minor denial of service.
-*   **Low:** Informational findings, best practice violations without direct exploit path.
+This project adheres to the following DevSecOps principles:
 
-## 4. Automated Security Scanning
+*   **Zero Trust:** All inputs are considered untrusted and are sanitized. This includes user inputs, API responses, and any data processed by the extension.
+*   **Supply Chain Security:** Dependency audits are performed regularly, and Software Bill of Materials (SBOMs) are generated to track all components.
+*   **Fail Fast:** Errors and invalid states are detected and reported immediately to prevent propagation of security risks.
+*   **Data Encryption:** Sensitive data, if handled and stored, will be encrypted at rest and in transit, adhering to industry-standard encryption protocols.
 
-This repository enforces automated security checks in the CI pipeline (`.github/workflows/ci.yml`):
-
-*   **Dependency Auditing:** Uses **Dependabot/Snyk** integration to scan all NPM dependencies for known CVEs on every push.
-*   **Static Analysis:** **Biome** is configured with strict rulesets to catch common JavaScript security anti-patterns before merge.
-*   **Supply Chain Integrity:** A **Software Bill of Materials (SBOM)** is generated as part of the release artifact process to track all transitive dependencies.
-
-## 5. Development Security Guidelines
-
-Developers working on this project must adhere to the following guidelines:
-
-*   **No Secrets in Code:** API keys, tokens, or credentials must ONLY be loaded via runtime environment variables or secure secrets management (e.g., GitHub Secrets).
-*   **Principle of Least Privilege:** Content scripts and service workers are designed with the minimum necessary permissions (`permissions` in `manifest.json`).
-*   **External Code:** Avoid loading unvetted third-party libraries. All additions must pass the dependency audit step in CI.
-*   **Error Handling:** Utilize robust `try...catch` blocks around I/O operations to prevent state corruption or unexpected shutdowns.
+Thank you for helping us maintain the security and integrity of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension.
