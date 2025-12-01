@@ -1,52 +1,53 @@
-# Security Policy
+# Security Policy for TextWarden
 
-## Supported Versions
+## 1. Our Commitment to Security
 
-We are committed to maintaining a secure product. Currently, only the latest version of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension is actively maintained and supported with security patches.
+TextWarden is engineered with a **privacy-first and security-by-design** philosophy. As a browser extension that processes user input, we recognize the immense responsibility we have to protect our users. The security of our codebase, infrastructure, and user data is our highest priority. This document outlines our security procedures and how to report vulnerabilities.
 
-## Reporting a Vulnerability
+## 2. Supported Versions
 
-We take security very seriously. If you discover any security vulnerabilities within TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension, please report it to us immediately. We appreciate your help in keeping our community safe.
+Security updates are only applied to the most recent version of the TextWarden extension available on official browser web stores (e.g., Chrome Web Store, Firefox Add-ons). We strongly advise all users to keep their browsers and extensions updated to ensure they have the latest security patches.
 
-To report a vulnerability, please:
+| Version | Supported          |
+| ------- | ------------------ |
+| Latest  | :white_check_mark: |
+| < 1.0.0 | :x:                |
 
-1.  **Do NOT** disclose the vulnerability publicly until it has been resolved.
-2.  **DO** use the secure reporting channel:
-    *   **Email:** [security@example.com](mailto:security@example.com) (Please replace with a real security contact email).
-    *   **Subject:** `Security Vulnerability Report: [Project Name]`
-    *   **Content:** Provide a clear and concise description of the vulnerability, including:
-        *   The affected version(s).
-        *   Detailed steps to reproduce the vulnerability.
-        *   Any supporting evidence (screenshots, logs, code snippets).
-        *   Your recommended mitigation or fix (if known).
+## 3. Reporting a Vulnerability
 
-We will acknowledge receipt of your report within **48 hours** and will provide an estimated timeline for resolution.
+We take all security reports seriously. If you believe you have discovered a security vulnerability in TextWarden, please report it to us privately to protect our users.
 
-## Vulnerability Disclosure Policy
+**Do not disclose the vulnerability publicly until a resolution has been issued.**
 
-Once a vulnerability is reported and confirmed, we will work diligently to address it. We will follow these principles:
+### How to Report
 
-*   **Triaging:** We will assess the severity and impact of the reported vulnerability.
-*   **Remediation:** We will develop and test a fix.
-*   **Disclosure:** We will work with the reporter to determine a coordinated public disclosure timeline, typically after a fix is available. This allows users to update and protect themselves.
-*   **Acknowledgement:** We will acknowledge the contributions of security researchers who report valid vulnerabilities in good faith.
+Please use GitHub's private vulnerability reporting feature to submit your findings.
 
-## Security Best Practices
+**[Report a private vulnerability here](https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/security/advisories/new)**
 
-As a user of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension, please adhere to the following security best practices:
+### What to Include
 
-*   **Install Updates Promptly:** Always keep the extension updated to the latest version to benefit from the most recent security patches.
-*   **Review Permissions:** Be mindful of the permissions requested by browser extensions. While TextWarden is designed with privacy and security as top priorities, always be aware of what an extension can access.
-*   **API Key Security:** If you are developing custom integrations or using TextWarden in a specific enterprise context requiring API keys (e.g., Google Gemini API), ensure these keys are stored securely and are not exposed in client-side code or public repositories.
-*   **Browser Security:** Maintain good general browser security hygiene, including using strong, unique passwords, enabling two-factor authentication where possible, and being cautious of phishing attempts.
+To help us resolve the issue quickly, please provide a detailed report including:
 
-## DevSecOps Protocol Adherence
+*   **A clear description** of the vulnerability and its potential impact.
+*   **Precise steps to reproduce** the issue, including any required environment setup, code snippets, or proof-of-concept exploits.
+*   The **version** of the extension and browser you were using.
+*   Any **screenshots or logs** that could aid in the investigation.
 
-This project adheres to the following DevSecOps principles:
+### Our Process
 
-*   **Zero Trust:** All inputs are considered untrusted and are sanitized. This includes user inputs, API responses, and any data processed by the extension.
-*   **Supply Chain Security:** Dependency audits are performed regularly, and Software Bill of Materials (SBOMs) are generated to track all components.
-*   **Fail Fast:** Errors and invalid states are detected and reported immediately to prevent propagation of security risks.
-*   **Data Encryption:** Sensitive data, if handled and stored, will be encrypted at rest and in transit, adhering to industry-standard encryption protocols.
+1.  **Acknowledgment:** We will acknowledge receipt of your report within 48 business hours.
+2.  **Investigation:** Our team will investigate the report to validate the vulnerability.
+3.  **Updates:** We will provide regular updates on our progress.
+4.  **Remediation:** We will work to release a patch as quickly as possible. The timeline will depend on the complexity of the vulnerability.
+5.  **Disclosure:** Once the vulnerability is patched and the update is available, we will coordinate with you on public disclosure if desired.
 
-Thank you for helping us maintain the security and integrity of TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension.
+## 4. Security Design Principles
+
+*   **Principle of Least Privilege:** TextWarden's `manifest.json` requests only the minimum permissions required for its core functionality. We avoid broad permissions like `<all_urls>`.
+*   **Data Minimization & Ephemeral Processing:** TextWarden is designed to be stateless. We **do not** store, log, or transmit any user-written content or personally identifiable information (PII) to our servers. All AI processing is done via ephemeral, anonymized requests to the Google Gemini API.
+*   **API Key Security:** API keys are managed securely and are never exposed on the client-side.
+*   **Dependency Management:** We use tools like Dependabot and `npm audit` to continuously monitor our dependencies for known vulnerabilities and apply patches promptly.
+*   **Content Security Policy (CSP):** We enforce a strict CSP to mitigate the risk of Cross-Site Scripting (XSS) and other injection attacks.
+
+Thank you for helping us keep TextWarden and our users safe.
