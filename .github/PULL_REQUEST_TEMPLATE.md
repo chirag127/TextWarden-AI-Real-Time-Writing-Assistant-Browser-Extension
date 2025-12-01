@@ -1,52 +1,71 @@
-# Pull Request Template
+<!--
+Thank you for your contribution to TextWarden!
 
-## 🚀 What is this PR about?
+To ensure a seamless review process, please provide the following information.
+Replace the bracketed text with your own details.
+-->
 
-*(Provide a concise summary of the changes introduced by this PR. What problem does it solve? What feature does it add?)*
+### Related Issue
 
-## 🎯 What kind of change does this introduce?
+- **Closes:** #[issue_number]
 
-*(Select one or more applicable options)*
+---
 
-- [ ] **Bug fix** (non-breaking change which fixes an issue)
-- [ ] **New feature** (non-breaking change which adds functionality)
-- [ ] **Breaking change** (fix or feature that would cause existing functionality to not work as expected)
-- [ ] **Documentation update** (changes related to documentation)
-- [ ] **Refactoring** (code style changes, none of which affect the meaning of the code)
-- [ ] **Performance improvements** (optimizations)
-- [ ] **Testing** (adding or modifying tests)
-- [ ] **Build process or CI/CD update**
-- [ ] **Other** (please describe):
+### Description
 
-## 📝 How was this tested?
+<!--
+Provide a concise, high-level summary of the changes. Explain the "why" behind this pull request.
+What problem does it solve? What is the expected outcome?
+-->
 
-*(Describe the tests that were run to verify your changes. If applicable, add details about how to reproduce the bug or test the feature.)*
+[Your detailed description here.]
 
-- [ ] Unit Tests (`vitest`):
-- [ ] E2E Tests (`playwright`):
-- [ ] Manual Testing:
+### Changes Made
 
-## 📈 Related Issues
+<!--
+Provide a technical, itemized list of the changes you have implemented.
+- Refactored the `useGeminiAPI` hook for improved error handling.
+- Added a new `SettingsPanel` component using React and TailwindCSS.
+- Updated the TypeScript types for the `UserConfiguration` interface.
+-->
 
-*(Link to any relevant issues. Use keywords like `closes`, `fixes`, `resolves` to auto-close issues when the PR is merged.)*
+- [Change 1]
+- [Change 2]
+- [Change 3]
 
-- `closes #issue-number`
+### Screenshots / Demos
 
-## 🌟 Checklist
+<!--
+For any UI/UX changes, please provide screenshots, GIFs, or a short video.
+This is crucial for an effective review.
+-->
 
-*(Ensure all the following points are addressed before submitting the PR.)*
+[Drag and drop images or link to a video here.]
 
-- [ ] My code follows the project's **Apex Technical Authority** coding standards.
-- [ ] I have performed a self-review of my own code.
-- [ ] I have commented my code, particularly in hard-to-understand areas.
-- [ ] I have made corresponding changes to the documentation.
-- [ ] My changes generate no new warnings or errors in the console (`0 errors` standard).
-- [ ] I have updated relevant unit tests or added new ones.
-- [ ] All new and existing, passing tests pass locally with my changes.
-- [ ] Any dependent changes have been merged and published in downstream modules.
-- [ ] I have updated the `README.md` with any significant changes, following the **Hero-Tier Protocol**.
-- [ ] My changes adhere to the **DevSecOps Protocol** and **Zero Trust** principles.
+---
 
-## 💡 Additional Notes
+### Contributor Checklist
 
-*(Add any other context about the pull request that may be helpful to reviewers.)*
+<!--
+Go through this checklist and mark the items that are complete. If an item is not applicable, mark it as N/A.
+This checklist is mandatory for all contributions.
+-->
+
+- [ ] **Code Quality & Standards**
+  - [ ] My code follows the project's coding standards and architectural principles as defined in the [CONTRIBUTING.md](https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/blob/main/.github/CONTRIBUTING.md).
+  - [ ] I have run `npm run format` and `npm run lint` locally, and there are no new errors or warnings.
+  - [ ] The code adheres to SOLID, DRY, and YAGNI principles.
+  - [ ] All new functions, classes, and components are documented with TSDoc comments.
+
+- [ ] **Testing & Verification**
+  - [ ] I have added or updated unit tests (Vitest) to cover the new logic.
+  - [ ] I have added or updated end-to-end tests (Playwright), if applicable.
+  - [ ] All existing and new tests pass locally (`npm test`).
+  - [ ] I have manually tested the changes in a clean browser profile (Chrome, Firefox).
+
+- [ ] **Documentation**
+  - [ ] I have updated the `README.md` and any other relevant documentation to reflect my changes.
+  - [ ] I have documented any new environment variables or configuration changes.
+
+- [ ] **Accessibility (a11y)**
+  - [ ] I have tested the changes for accessibility (e.g., keyboard navigation, screen reader compatibility).
