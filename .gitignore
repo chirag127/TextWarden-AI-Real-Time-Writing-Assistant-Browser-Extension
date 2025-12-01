@@ -1,33 +1,42 @@
-# Node.js
+# Node.js modules
 node_modules/
 
-# Build artifacts
+# Distribution files
 dist/
-bundle/
-*.js.map
-coverage/
-.turbo/
+build/
 
-# IDE / Editor
+# IDE-specific files
 .idea/
 .vscode/
-*.iml
-.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 
-# System Files
-.env
-.env.local
-
-# Logs
+# Debug files
 *.log
-*.txt
+*.DS_Store
 
-# Tauri
-/src-tauri/target/
-/src-tauri/dist/
+# Temporary files
+*~.swp
 
-# WXT
+# Environment configuration
+.env
+
+# Compiled source
+*.js
+*.js.map
+
+# Packages
+*.tgz
+*.tar.gz
+
+# WXT specific files
 .wxt/
 
+# Playwright-specific files
+/test-results
+/playwright-report
+
 # Biome cache
-.biome/
+./.biome
