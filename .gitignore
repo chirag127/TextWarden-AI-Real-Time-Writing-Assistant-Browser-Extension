@@ -1,42 +1,40 @@
 # Node.js modules
 node_modules/
 
-# Distribution files
+# Parcel bundler
+.parcel-cache
 dist/
-build/
 
-# IDE-specific files
-.idea/
-.vscode/
+# Yarn Package Manager
+.yarn/
+
+# IDEs and editors
+.idea
+.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.swp
 
-# Debug files
+# Browser extension packaging
+web-ext-artifacts/
+
+# Log files
 *.log
-*.DS_Store
 
-# Temporary files
-*~.swp
+# Dependency management
+yarn-error.log*
 
 # Environment configuration
 .env
+.env.*
 
-# Compiled source
-*.js
-*.js.map
+# Temporary files
+*~
 
-# Packages
-*.tgz
-*.tar.gz
+# Mac OS
+.DS_Store
 
-# WXT specific files
-.wxt/
-
-# Playwright-specific files
-/test-results
-/playwright-report
-
-# Biome cache
-./.biome
+# Chrome Extension Manifest V3 Build Files
+build/
