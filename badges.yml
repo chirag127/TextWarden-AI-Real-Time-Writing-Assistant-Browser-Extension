@@ -1,0 +1,25 @@
+badges:
+  - name: Build Status
+    label: "Build"
+    image_url: "https://img.shields.io/github/actions/workflow/status/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/.github/workflows/ci.yml?branch=main&style=flat-square&label=build"
+    link_url: "https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/actions/workflows/ci.yml"
+  - name: Code Coverage
+    label: "Coverage"
+    image_url: "https://codecov.io/gh/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/branch/main/graph/badge.svg"
+    link_url: "https://codecov.io/gh/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension"
+  - name: Tech Stack
+    label: "Tech Stack"
+    image_url: "https://img.shields.io/badge/Tech Stack-TypeScript%20%7C%20React%20%7C%20Vite%20%7C%20TailwindCSS-007ACC?style=flat-square&logo=typescript&logoColor=white"
+    link_url: "#tech-stack"
+  - name: Linting & Formatting
+    label: "Lint & Format"
+    image_url: "https://img.shields.io/badge/Lint%20%26%20Format-BiomeJS-green?style=flat-square&logo=biome&logoColor=white"
+    link_url: "https://biomejs.dev/"
+  - name: License
+    label: "License"
+    image_url: "https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey?style=flat-square"
+    link_url: "https://creativecommons.org/licenses/by-nc/4.0/"
+  - name: GitHub Stars
+    label: "Stars"
+    image_url: "https://img.shields.io/github/stars/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension?style=flat-square&color=yellow&label=Stars"
+    link_url: "https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/stargazers"
