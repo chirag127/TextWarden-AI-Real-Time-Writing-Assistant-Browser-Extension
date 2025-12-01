@@ -1,80 +1,64 @@
 ---
-name: 🐞 Bug Report
-abel_type: bug
-about: Report an unexpected behavior or functional defect.
-labels: bug, triage
+name: "🐞 Bug Report"
+description: "Report a reproducible bug or unexpected behavior in TextWarden."
+title: "[Bug] Brief, descriptive title of the issue"
+labels: ["bug", "triage"]
+assignees: ''
 
 ---
 
-# 🐞 Bug Report: TextWarden Integrity Check
+### 🚨 Preliminary Checks
 
-This template ensures rapid diagnosis and resolution. **Failure to provide all requested details will result in triage delay.**
+- [ ] I have searched the [existing issues](https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/issues) and confirmed this is not a duplicate.
+- [ ] I have read the [Contributing Guidelines](https://github.com/chirag127/TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension/blob/main/.github/CONTRIBUTING.md).
+- [ ] I am running the latest version of the extension.
 
-## 1. EXECUTIVE SUMMARY (BLUF)
+### 🐛 Bug Description
 
-**In one sentence, what is the unexpected behavior?**
+A clear and concise description of what the bug is. What happened, and what should have happened?
 
-> [Provide a concise, actionable summary here. Example: 'Grammar correction fails silently when user is on a dark-mode webpage.']
+### 🔄 Steps to Reproduce
 
+Provide a clear, step-by-step sequence of actions to reproduce the behavior:
 
-## 2. OBSERVABLE BEHAVIOR (WHAT HAPPENED)
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-Describe exactly what you observed when the bug occurred.
+### ✅ Expected Behavior
 
-*   **Expected Result:** What should have happened according to the documentation/intent?
-*   **Actual Result:** What actually happened?
-*   **Impact Assessment:** (Critical, High, Medium, Low) How severely does this impact content creation quality or user workflow?
+A clear and concise description of what you expected to happen.
 
+### ❌ Actual Behavior
 
-## 3. REPLICATION STEPS (THE RECIPE FOR FAILURE)
+A clear and concise description of what actually happened. If applicable, include the full error message.
 
-Provide precise, ordered steps to reproduce the issue reliably. If the bug is intermittent, state the observed frequency (e.g., 1 in 5 attempts).
+### 📸 Screenshots or Screencast
 
-1.  Navigate to: `[URL or Application Context]`
-2.  Ensure Extension State: `[Enabled/Disabled/Specific Settings]`
-3.  Action Performed: `[e.g., Typed 'Their going to the store']`
-4.  Observed Failure Trigger: `[e.g., Pressed Spacebar]`
+If applicable, add screenshots, GIFs, or a short video to help explain the problem. This is often the most helpful part of a bug report!
 
+(You can drag and drop images or videos directly into this editor.)
 
-## 4. ENVIRONMENT (THE ARCHITECTURAL CONTEXT)
+### 💻 Environment Details
 
-To ensure alignment with the Apex Toolchain standards, provide the following telemetry.
+Please complete the following information:
 
-### Browser Environment
+- **Browser & Version:** [e.g., Chrome 125.0.6422.112, Firefox 126.0]
+- **Operating System:** [e.g., macOS Sonoma 14.5, Windows 11 Pro]
+- **TextWarden Version:** [e.g., v1.0.0 - You can find this on the browser's extensions page]
 
-*   **Browser & Version:** (e.g., Chrome 125.0.6422.142, Firefox 126)
-*   **Operating System:** (e.g., macOS Sonoma 14.5, Windows 11 Build 22621)
-*   **Extension Version:** (Find in `chrome://extensions` details page or `about:debugging`)
+### 📋 Console Logs
 
-### TextWarden Configuration
+Please open the browser's developer console (usually with F12 or Ctrl+Shift+I / Cmd+Opt+I) and paste any relevant error messages or logs here. Make sure to check both the **background service worker** console and the **content script** console for the page where the bug occurred.
 
-*   **Gemini Model Selected (If configurable):** (e.g., `gemini-3-pro-preview` or Default)
-*   **Privacy Mode Active:** (Yes/No)
-*   **Specific Custom Rules/Overrides:** (If any)
-
-
-## 5. TELEMETRY & ARTIFACTS
-
-**Attach any relevant console logs, network traffic data, or screenshots.**
-
-### Console Logs (Crucial)
-
-Please open the browser Developer Tools (F12) -> Console tab, reproduce the error, and paste the **entire** output here. Filter for errors/warnings related to `TextWarden`.
-
-```log
-[Paste Full Console Log Here]
-```
-
-### Network Artifacts (If relevant to API calls)
-
-If the issue seems related to the Gemini API connection, attach HAR data or relevant failed request details.
+log
+(Paste console logs here)
 
 
-## 🤖 AGENT DIRECTIVE CHECK
+### 📝 Additional Context
 
-*   **AI Verification:** Has this issue been confirmed via automated integration tests in the `tests/integration/bugs` suite? (If known)
-*   **Priority Assignment:** Based on severity, the initial priority should be: `[Critical/High/Medium/Low]`
-
---- 
-
-*Thank you for contributing to the integrity of TextWarden. Your precision aids our recursive perfection loop.*
+Add any other context about the problem here. For example:
+- Was this working before?
+- Are you using any other extensions that might interfere?
+- Does this happen on a specific website?
