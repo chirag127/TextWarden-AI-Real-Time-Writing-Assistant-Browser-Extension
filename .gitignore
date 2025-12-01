@@ -1,45 +1,51 @@
 # Node.js
 node_modules/
-dist/
-build/
-.env
-.env.local
-.env.*.local
-
-# WXT/Vite specific
-.wxt/
-.vite/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Logging
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnp/
+.pnp.js
 
-# Test coverage
+# TypeScript/JavaScript build artifacts
+dist/
+build/
 coverage/
-.vitest-cache/
+*.tsbuildinfo
 
-# Playwright
-test-results/
-playwright-report/
+# Vite-specific
+.vite/
 
-# Editor/IDE specific
+# Dependency locks (optional, if you manage them differently)
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Environment variables
+.env
+.env.*
+!env.example
+
+# Editor/IDE files
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
 
-# OS specific
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Biome cache
-.biome/
-
-# Other generated files
+# Logs
+logs/
 *.log
-*.bak
-*.swp
+
+# Test results
+junit.xml
+*.tap
+
+# Cache
+.cache/
+.nyc_output/
+
+# Browser extension specific (if any generated content that shouldn't be committed)
+# For Manifest V3, the 'dist' folder usually contains the final build, which is already ignored.
