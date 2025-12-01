@@ -1,62 +1,52 @@
-```markdown
-## Pull Request
+# Pull Request Template
 
-Thank you for contributing to TextWarden! Before submitting this PR, please ensure the following:
+## 🚀 What is this PR about?
 
-### Checklist:
+*(Provide a concise summary of the changes introduced by this PR. What problem does it solve? What feature does it add?)*
 
--   [ ] I have read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) guide.
--   [ ] My code follows the project's coding style and conventions.
--   [ ] I have added unit tests for my changes (if applicable).
--   [ ] All existing tests pass.
--   [ ] I have updated the documentation (if applicable).
--   [ ] My changes have been reviewed and approved by at least one other contributor.
+## 🎯 What kind of change does this introduce?
 
-### Description of Changes:
+*(Select one or more applicable options)*
 
-<!-- Briefly describe the changes made in this pull request.  Include details about the problem being solved and the approach taken. -->
+- [ ] **Bug fix** (non-breaking change which fixes an issue)
+- [ ] **New feature** (non-breaking change which adds functionality)
+- [ ] **Breaking change** (fix or feature that would cause existing functionality to not work as expected)
+- [ ] **Documentation update** (changes related to documentation)
+- [ ] **Refactoring** (code style changes, none of which affect the meaning of the code)
+- [ ] **Performance improvements** (optimizations)
+- [ ] **Testing** (adding or modifying tests)
+- [ ] **Build process or CI/CD update**
+- [ ] **Other** (please describe):
 
-### Related Issues:
+## 📝 How was this tested?
 
-<!-- Link any related issues here.  Use the format:  `Closes #<issue_number>`.  For example: `Closes #123` -->
+*(Describe the tests that were run to verify your changes. If applicable, add details about how to reproduce the bug or test the feature.)*
 
-### Screenshots/Visuals (if applicable):
+- [ ] Unit Tests (`vitest`):
+- [ ] E2E Tests (`playwright`):
+- [ ] Manual Testing:
 
-<!-- Add screenshots or other visuals to demonstrate the changes. -->
+## 📈 Related Issues
 
-### Additional Notes:
+*(Link to any relevant issues. Use keywords like `closes`, `fixes`, `resolves` to auto-close issues when the PR is merged.)*
 
-<!-- Any other information or context that might be helpful for reviewers. -->
+- `closes #issue-number`
 
---- 
+## 🌟 Checklist
 
-<details>
-<summary>🤖 AI Agent Directives - TextWarden</summary>
+*(Ensure all the following points are addressed before submitting the PR.)*
 
-This project is an AI-powered browser extension for enhancing written communication.  The tech stack is:
+- [ ] My code follows the project's **Apex Technical Authority** coding standards.
+- [ ] I have performed a self-review of my own code.
+- [ ] I have commented my code, particularly in hard-to-understand areas.
+- [ ] I have made corresponding changes to the documentation.
+- [ ] My changes generate no new warnings or errors in the console (`0 errors` standard).
+- [ ] I have updated relevant unit tests or added new ones.
+- [ ] All new and existing, passing tests pass locally with my changes.
+- [ ] Any dependent changes have been merged and published in downstream modules.
+- [ ] I have updated the `README.md` with any significant changes, following the **Hero-Tier Protocol**.
+- [ ] My changes adhere to the **DevSecOps Protocol** and **Zero Trust** principles.
 
--   **Language:** JavaScript (ESNext)
--   **Framework:**  Likely using a framework like React, Vue, or Svelte for the extension's UI.  Specify which one when known.
--   **Build System:** Vite (for fast builds and hot module replacement)
--   **Extension API:** Browser Extension APIs (Manifest V3)
--   **AI Integration:**  User-provided API keys to access AI models (e.g., OpenAI, Gemini).
--   **Testing:** Vitest (Unit Tests), Playwright (E2E Tests), Biome (Linting & Formatting)
+## 💡 Additional Notes
 
-**Architectural Patterns:**
-
--   **Feature-Sliced Design (FSD):** Organize code by features (e.g., grammar-check, spell-check, style-suggestions), with clear separation of concerns.
--   **Clean Architecture:**
-    -   Independent of Frameworks:  No framework dependency.
-    -   Testable:  Easily testable code.
-    -   Independent of UI: The UI can change without affecting the business logic.
-    -   Independent of Database:  Data access is abstracted.
-    -   Independent of External Agencies: AI API interactions are abstracted.
-
-**Verification Commands:**
-
--   `npm install`: Install dependencies.
--   `npm run build`: Build the extension (creates production-ready bundle).
--   `npm run test`: Run all tests (unit and integration).
--   `npm run lint`: Run the linter and formatter (Biome).
-
-</details>
+*(Add any other context about the pull request that may be helpful to reviewers.)*
