@@ -1,54 +1,64 @@
-# Security Policy for TextWarden-AI-Writing-Assistant-Browser-Extension
+# 🔒 Security Policy for TextWarden-AI-Real-Time-Writing-Assistant-Browser-Extension
 
-At TextWarden, the security of our users and their data is paramount. We are committed to maintaining a robust and secure browser extension. This document outlines our security policy and provides guidelines for reporting vulnerabilities.
+This document outlines the security model, vulnerability reporting procedures, and best practices for maintaining the integrity and privacy of the TextWarden extension.
 
-## 1. Reporting a Vulnerability
+## 1. Security Commitment: Privacy-First Architecture
 
-We appreciate the efforts of security researchers and the community in helping us maintain a secure product. If you discover a security vulnerability in TextWarden, we ask that you report it to us immediately and responsibly.
+TextWarden is designed with a **Zero Trust** approach, particularly concerning user input and interaction with the Google Gemini API. Our core commitment is that user data processed by the extension remains local or is handled via the most secure, non-logging endpoints available, adhering strictly to the security posture required by Manifest V3.
 
-**Please DO NOT open a public GitHub issue.**
+### Architectural Security Principles Enforced:
 
-To report a vulnerability, please send an email to: `security@textwarden.com` (placeholder - replace with actual security contact).
+1.  **Input Sanitization:** All data transmitted to the Gemini API is aggressively validated and sanitized on the client-side and server-side (if a proxy exists) to prevent injection attacks (XSS, prompt injection). **(OWASP Top 10 2025 Focus)**.
+2.  **Key Management:** API keys are never hardcoded. They are managed via secure environment variables during the build process and are **never** shipped to the client bundle.
+3.  **Manifest V3 Compliance:** Strict adherence to MV3 rules regarding background service workers, network requests, and content script isolation.
+4.  **Data Minimization:** Only textual content required for linguistic analysis is sent; no PII or historical navigation data is collected or transmitted unless explicitly consented to for feature improvement.
 
-**In your report, please include:**
+## 2. Supported Versions
 
-*   **Clear Description:** A detailed description of the vulnerability, its potential impact, and the affected components.
-*   **Reproduction Steps:** Step-by-step instructions to reproduce the vulnerability. This is crucial for us to verify and address the issue efficiently. Include any specific configurations, API keys, or conditions required.
-*   **Proof of Concept (PoC):** If possible, provide a Proof of Concept (PoC) code or demonstration that clearly illustrates the vulnerability.
-*   **Severity Assessment:** Your assessment of the vulnerability's severity (e.g., Critical, High, Medium, Low), along with any relevant CVSS scores if applicable.
-*   **Your Contact Information:** We may need to contact you for further clarification.
+| Version Range | Status | Security Updates | Reporting Path |
+| :--- | :--- | :--- | :--- |
+| `v2.x.x` (Current) | Maintained | Weekly | Immediate |
+| `v1.x.x` | Legacy | None | Upgrade Recommended |
 
-## 2. Our Commitment to Responsible Disclosure
+## 3. Vulnerability Reporting
 
-We adhere to responsible disclosure principles and ask reporters to do the same. We commit to:
+We value external security researchers. If you discover a security vulnerability, please follow the process below to ensure responsible disclosure.
 
-*   **Prompt Acknowledgment:** We will acknowledge receipt of your report within 2 business days.
-*   **Timely Investigation:** We will investigate your report promptly and provide an estimated timeline for resolution.
-*   **Communication:** We will keep you informed of our progress throughout the vulnerability resolution process.
-*   **Public Disclosure (Post-Fix):** Once the vulnerability is resolved, we will disclose it publicly via GitHub Security Advisories, crediting the discoverer (unless anonymity is requested).
+### 3.1. Responsible Disclosure Process
 
-## 3. Supported Versions
+**DO NOT** disclose vulnerabilities publicly (e.g., GitHub Issues, public forums) before coordinating with the maintainers.
 
-We are committed to providing security updates for the following versions of TextWarden:
+1.  **Report:** Create a **private security report** via GitHub's private vulnerability reporting feature. This ensures that only core maintainers have access to the details.
+2.  **Details:** Provide sufficient detail for reproduction, including:
+    *   The affected version(s).
+    *   Steps to reproduce the vulnerability.
+    *   The potential impact.
+3.  **Acknowledgement:** We will acknowledge receipt of your report within **48 hours**.
+4.  **Remediation:** We aim to deploy a fix for critical and high-severity issues within **14 days** of confirmation. We will coordinate with you before public disclosure.
+5.  **Public Disclosure:** Public disclosure will occur after a patch has been released and sufficient time has passed for users to update.
 
-*   **Latest Major Version:** We actively maintain and provide security patches for the latest major release of the extension.
-*   **Previous Major Version:** Security patches for the immediately preceding major version may be provided on a case-by-case basis, depending on the severity of the vulnerability and resource availability. However, we strongly encourage users to update to the latest version for the best security posture.
+### 3.2. Severity Classification
 
-Versions older than the two most recent major releases are **not officially supported** for security updates.
+We classify issues based on potential impact on user data confidentiality, integrity, and extension availability:
 
-## 4. General Security Practices
+*   **Critical:** Remote Code Execution in Service Worker, Complete API Key Leakage, Massive Data Exfiltration.
+*   **High:** Prompt Injection leading to unauthorized API calls, CSP bypass, Persistent Cross-Site Scripting (XSS).
+*   **Medium:** Information disclosure of non-sensitive runtime data, minor denial of service.
+*   **Low:** Informational findings, best practice violations without direct exploit path.
 
-TextWarden incorporates robust security practices into its development lifecycle:
+## 4. Automated Security Scanning
 
-*   **Input Validation:** Strict validation and sanitization of all user inputs to prevent common injection attacks (XSS, etc.).
-*   **Least Privilege:** Following the principle of least privilege in both code execution and permission requests within the browser extension.
-*   **Dependency Scanning:** Regular scanning of third-party dependencies for known vulnerabilities using automated tools.
-*   **Content Security Policy (CSP):** A strong CSP is enforced to mitigate cross-site scripting (XSS) and data injection attacks.
-*   **Data Encryption:** Sensitive data (e.g., API keys, if stored locally) is handled with appropriate encryption and user control.
-*   **Privacy-First Design:** The extension is designed with privacy as a core principle, minimizing data collection and processing locally where possible.
+This repository enforces automated security checks in the CI pipeline (`.github/workflows/ci.yml`):
 
-## 5. Security Advisories
+*   **Dependency Auditing:** Uses **Dependabot/Snyk** integration to scan all NPM dependencies for known CVEs on every push.
+*   **Static Analysis:** **Biome** is configured with strict rulesets to catch common JavaScript security anti-patterns before merge.
+*   **Supply Chain Integrity:** A **Software Bill of Materials (SBOM)** is generated as part of the release artifact process to track all transitive dependencies.
 
-All past and future security advisories for TextWarden will be published on our [GitHub Security Advisories page](https://github.com/TextWarden/TextWarden-AI-Writing-Assistant-Browser-Extension/security/advisories).
+## 5. Development Security Guidelines
 
-We thank you for helping us make TextWarden a safer and more reliable tool for everyone.
+Developers working on this project must adhere to the following guidelines:
+
+*   **No Secrets in Code:** API keys, tokens, or credentials must ONLY be loaded via runtime environment variables or secure secrets management (e.g., GitHub Secrets).
+*   **Principle of Least Privilege:** Content scripts and service workers are designed with the minimum necessary permissions (`permissions` in `manifest.json`).
+*   **External Code:** Avoid loading unvetted third-party libraries. All additions must pass the dependency audit step in CI.
+*   **Error Handling:** Utilize robust `try...catch` blocks around I/O operations to prevent state corruption or unexpected shutdowns.
